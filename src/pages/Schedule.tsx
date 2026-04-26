@@ -32,6 +32,7 @@ const Schedule = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [appts, setAppts] = useState<Appt[]>([]);
   const [open, setOpen] = useState(false);
+  const [patientId, setPatientId] = useState("");
 
   useEffect(() => { document.title = "Agenda | Painel Clínico"; load(); }, []);
 
@@ -47,16 +48,15 @@ const Schedule = () => {
   const create = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const patient_id = fd.get("patient_id") as string;
     const date = fd.get("date") as string;
     const time = fd.get("time") as string;
     const duration_minutes = Number(fd.get("duration") || 30);
     const notes = (fd.get("notes") as string) || null;
-    if (!patient_id || !date || !time) { toast.error("Preencha todos os campos"); return; }
+    if (!patientId || !date || !time) { toast.error("Preencha todos os campos"); return; }
     const scheduled_at = new Date(`${date}T${time}`).toISOString();
-    const { error } = await supabase.from("appointments").insert({ patient_id, scheduled_at, duration_minutes, notes });
+    const { error } = await supabase.from("appointments").insert({ patient_id: patientId, scheduled_at, duration_minutes, notes });
     if (error) toast.error(error.message);
-    else { toast.success("Consulta agendada"); setOpen(false); load(); }
+    else { toast.success("Consulta agendada"); setOpen(false); setPatientId(""); load(); }
   };
 
   const updateStatus = async (a: Appt, status: Appt["status"]) => {
@@ -100,13 +100,12 @@ const Schedule = () => {
             <form onSubmit={create} className="space-y-4">
               <div>
                 <Label>Paciente</Label>
-                <Select name="patient_id">
+                <Select value={patientId} onValueChange={setPatientId}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                <input type="hidden" name="patient_id" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Data</Label><Input type="date" name="date" required /></div>

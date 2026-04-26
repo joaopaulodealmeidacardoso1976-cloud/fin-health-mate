@@ -35,6 +35,7 @@ const Finance = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [open, setOpen] = useState(false);
   const [method, setMethod] = useState("pix");
+  const [patientId, setPatientId] = useState("");
 
   useEffect(() => { document.title = "Financeiro | Painel Clínico"; load(); }, []);
 
@@ -50,14 +51,13 @@ const Finance = () => {
   const create = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const patient_id = fd.get("patient_id") as string;
     const amount = Number(fd.get("amount"));
     const date = fd.get("date") as string;
     const notes = (fd.get("notes") as string) || null;
-    if (!patient_id || !amount || amount <= 0) { toast.error("Preencha paciente e valor"); return; }
+    if (!patientId || !amount || amount <= 0) { toast.error("Preencha paciente e valor"); return; }
     const paid_at = date ? new Date(date).toISOString() : new Date().toISOString();
-    const { error } = await supabase.from("payments").insert({ patient_id, amount, method: method as any, paid_at, notes });
-    if (error) toast.error(error.message); else { toast.success("Pagamento registrado"); setOpen(false); load(); }
+    const { error } = await supabase.from("payments").insert({ patient_id: patientId, amount, method: method as any, paid_at, notes });
+    if (error) toast.error(error.message); else { toast.success("Pagamento registrado"); setOpen(false); setPatientId(""); load(); }
   };
 
   const remove = async (id: string) => {
@@ -97,11 +97,10 @@ const Finance = () => {
             <form onSubmit={create} className="space-y-4">
               <div>
                 <Label>Paciente</Label>
-                <Select name="patient_id">
+                <Select value={patientId} onValueChange={setPatientId}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>{patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
                 </Select>
-                <input type="hidden" name="patient_id" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Valor (R$)</Label><Input type="number" name="amount" step="0.01" min="0" required /></div>

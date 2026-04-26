@@ -78,8 +78,9 @@ const Dashboard = () => {
         </Select>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <KpiCard icon={<Wallet />} label="Receita" value={fmt(stats.revenue)} accent="gold" />
+        <KpiCard icon={<TrendingUp />} label="Lucro bruto" value={fmt(stats.revenue)} accent="success" />
         <KpiCard icon={<TrendingDown />} label="Despesas" value={fmt(stats.expenses)} />
         <KpiCard icon={<DollarSign />} label="Lucro líquido" value={fmt(stats.profit)} accent={stats.profit >= 0 ? "success" : "destructive"} />
         <KpiCard icon={<CalendarCheck />} label="Atendidos" value={`${stats.attendedCount} / ${stats.appointmentsCount}`} />

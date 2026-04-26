@@ -85,6 +85,83 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          min_quantity: number
+          name: string
+          notes: string | null
+          quantity: number
+          unit: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          min_quantity?: number
+          name: string
+          notes?: string | null
+          quantity?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          min_quantity?: number
+          name?: string
+          notes?: string | null
+          quantity?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          moved_at: string
+          movement_type: Database["public"]["Enums"]["movement_type"]
+          quantity: number
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          moved_at?: string
+          movement_type: Database["public"]["Enums"]["movement_type"]
+          quantity: number
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          moved_at?: string
+          movement_type?: Database["public"]["Enums"]["movement_type"]
+          quantity?: number
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           created_at: string
@@ -203,6 +280,7 @@ export type Database = {
         | "rent"
         | "utilities"
         | "other"
+      movement_type: "in" | "out"
       payment_method: "credit_card" | "debit_card" | "pix" | "cash"
     }
     CompositeTypes: {
@@ -340,6 +418,7 @@ export const Constants = {
         "utilities",
         "other",
       ],
+      movement_type: ["in", "out"],
       payment_method: ["credit_card", "debit_card", "pix", "cash"],
     },
   },

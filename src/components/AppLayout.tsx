@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell,
+  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell, Package,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ const nav = [
   { to: "/agenda", label: "Agenda", icon: CalendarDays },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/despesas", label: "Despesas", icon: Receipt },
+  { to: "/almoxarifado", label: "Almoxarifado", icon: Package },
 ];
 
 const AppLayout = ({ children }: { children: ReactNode }) => {

@@ -14,6 +14,7 @@ import Finance from "./pages/Finance";
 import Expenses from "./pages/Expenses";
 import Inventory from "./pages/Inventory";
 import Reports from "./pages/Reports";
+import AccessRequests from "./pages/AccessRequests";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/despesas" element={<Protected><Expenses /></Protected>} />
             <Route path="/almoxarifado" element={<Protected><Inventory /></Protected>} />
             <Route path="/relatorios" element={<Protected><Reports /></Protected>} />
+            <Route path="/admin/solicitacoes" element={<Protected><AccessRequests /></Protected>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

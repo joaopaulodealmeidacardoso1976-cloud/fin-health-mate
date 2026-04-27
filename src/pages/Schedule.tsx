@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ScheduleCalendar } from "@/components/ScheduleCalendar";
 import { Plus, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { format, isToday, isPast, isTomorrow } from "date-fns";

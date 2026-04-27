@@ -121,44 +121,57 @@ const Schedule = () => {
         </Dialog>
       </div>
 
-      {Object.keys(groups).length === 0 ? (
-        <Card className="shadow-soft"><CardContent className="py-16 text-center text-muted-foreground">Nenhuma consulta agendada</CardContent></Card>
-      ) : (
-        Object.entries(groups).map(([k, items]) => (
-          <div key={k}>
-            <h2 className="font-display text-xl mb-3 capitalize">{k}</h2>
-            <div className="space-y-2">
-              {items.map((a) => {
-                const d = new Date(a.scheduled_at);
-                return (
-                  <Card key={a.id} className="shadow-soft">
-                    <CardContent className="py-4 flex items-center gap-4 flex-wrap">
-                      <div className="text-center min-w-[60px]">
-                        <p className="font-display text-2xl">{format(d, "HH:mm")}</p>
-                        <p className="text-xs text-muted-foreground">{a.duration_minutes}min</p>
-                      </div>
-                      <div className="flex-1 min-w-[180px]">
-                        <p className="font-medium">{a.patients?.name ?? "—"}</p>
-                        {a.notes && <p className="text-xs text-muted-foreground mt-1">{a.notes}</p>}
-                      </div>
-                      <Badge variant="outline" className={statusColor[a.status]}>{statusLabel[a.status]}</Badge>
-                      <div className="flex gap-1">
-                        {a.status === "scheduled" && (
-                          <>
-                            <Button size="sm" variant="ghost" onClick={() => updateStatus(a, "attended")} className="text-success"><Check className="h-4 w-4 mr-1" />Compareceu</Button>
-                            <Button size="sm" variant="ghost" onClick={() => updateStatus(a, "missed")} className="text-destructive"><X className="h-4 w-4 mr-1" />Faltou</Button>
-                          </>
-                        )}
-                        <Button size="icon" variant="ghost" onClick={() => remove(a.id)}><Trash2 className="h-4 w-4 text-muted-foreground" /></Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        ))
-      )}
+      <Tabs defaultValue="calendar" className="w-full">
+        <TabsList>
+          <TabsTrigger value="calendar">Calendário</TabsTrigger>
+          <TabsTrigger value="list">Lista</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="calendar" className="mt-4">
+          <ScheduleCalendar appointments={appts} />
+        </TabsContent>
+
+        <TabsContent value="list" className="mt-4 space-y-6">
+          {Object.keys(groups).length === 0 ? (
+            <Card className="shadow-soft"><CardContent className="py-16 text-center text-muted-foreground">Nenhuma consulta agendada</CardContent></Card>
+          ) : (
+            Object.entries(groups).map(([k, items]) => (
+              <div key={k}>
+                <h2 className="font-display text-xl mb-3 capitalize">{k}</h2>
+                <div className="space-y-2">
+                  {items.map((a) => {
+                    const d = new Date(a.scheduled_at);
+                    return (
+                      <Card key={a.id} className="shadow-soft">
+                        <CardContent className="py-4 flex items-center gap-4 flex-wrap">
+                          <div className="text-center min-w-[60px]">
+                            <p className="font-display text-2xl">{format(d, "HH:mm")}</p>
+                            <p className="text-xs text-muted-foreground">{a.duration_minutes}min</p>
+                          </div>
+                          <div className="flex-1 min-w-[180px]">
+                            <p className="font-medium">{a.patients?.name ?? "—"}</p>
+                            {a.notes && <p className="text-xs text-muted-foreground mt-1">{a.notes}</p>}
+                          </div>
+                          <Badge variant="outline" className={statusColor[a.status]}>{statusLabel[a.status]}</Badge>
+                          <div className="flex gap-1">
+                            {a.status === "scheduled" && (
+                              <>
+                                <Button size="sm" variant="ghost" onClick={() => updateStatus(a, "attended")} className="text-success"><Check className="h-4 w-4 mr-1" />Compareceu</Button>
+                                <Button size="sm" variant="ghost" onClick={() => updateStatus(a, "missed")} className="text-destructive"><X className="h-4 w-4 mr-1" />Faltou</Button>
+                              </>
+                            )}
+                            <Button size="icon" variant="ghost" onClick={() => remove(a.id)}><Trash2 className="h-4 w-4 text-muted-foreground" /></Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

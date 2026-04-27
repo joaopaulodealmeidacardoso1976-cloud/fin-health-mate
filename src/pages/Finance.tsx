@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from "date-fns";
+import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface Patient { id: string; name: string; }
@@ -69,13 +69,15 @@ const Finance = () => {
   const now = new Date();
   const weekStart = startOfWeek(now, { weekStartsOn: 1 }), weekEnd = endOfWeek(now, { weekStartsOn: 1 });
   const monthStart = startOfMonth(now), monthEnd = endOfMonth(now);
+  const yearStart = startOfYear(now), yearEnd = endOfYear(now);
   const sumIn = (start: Date, end: Date) => payments.filter((p) => { const d = new Date(p.paid_at); return d >= start && d <= end; }).reduce((s, p) => s + Number(p.amount), 0);
   const weekTotal = sumIn(weekStart, weekEnd);
   const monthTotal = sumIn(monthStart, monthEnd);
+  const yearTotal = sumIn(yearStart, yearEnd);
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card className="shadow-soft border-l-4 border-l-gold">
           <CardHeader className="pb-2"><CardDescription>Balancete semanal</CardDescription><CardTitle className="font-display text-3xl">{fmt(weekTotal)}</CardTitle></CardHeader>
           <CardContent className="text-xs text-muted-foreground">{format(weekStart, "dd MMM", { locale: ptBR })} – {format(weekEnd, "dd MMM", { locale: ptBR })}</CardContent>
@@ -83,6 +85,10 @@ const Finance = () => {
         <Card className="shadow-soft border-l-4 border-l-gold-deep">
           <CardHeader className="pb-2"><CardDescription>Balancete mensal</CardDescription><CardTitle className="font-display text-3xl">{fmt(monthTotal)}</CardTitle></CardHeader>
           <CardContent className="text-xs text-muted-foreground">{format(monthStart, "MMMM 'de' yyyy", { locale: ptBR })}</CardContent>
+        </Card>
+        <Card className="shadow-soft border-l-4 border-l-primary">
+          <CardHeader className="pb-2"><CardDescription>Balancete anual</CardDescription><CardTitle className="font-display text-3xl">{fmt(yearTotal)}</CardTitle></CardHeader>
+          <CardContent className="text-xs text-muted-foreground">{format(yearStart, "yyyy", { locale: ptBR })}</CardContent>
         </Card>
       </div>
 

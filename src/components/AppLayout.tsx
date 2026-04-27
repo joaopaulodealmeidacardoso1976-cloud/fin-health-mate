@@ -1,14 +1,15 @@
 import { ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell, Package, FileText,
+  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell, Package, FileText, ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import AlertsBell from "@/components/AlertsBell";
 
-const nav = [
+const baseNav = [
   { to: "/", label: "Visão geral", icon: LayoutDashboard, end: true },
   { to: "/pacientes", label: "Pacientes", icon: Users },
   { to: "/agenda", label: "Agenda", icon: CalendarDays },
@@ -20,7 +21,11 @@ const nav = [
 
 const AppLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const location = useLocation();
+  const nav = isAdmin
+    ? [...baseNav, { to: "/admin/solicitacoes", label: "Solicitações", icon: ShieldCheck }]
+    : baseNav;
   const current = nav.find((n) => n.end ? location.pathname === n.to : location.pathname.startsWith(n.to));
 
   return (

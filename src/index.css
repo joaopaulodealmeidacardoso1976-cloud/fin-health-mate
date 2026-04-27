@@ -119,3 +119,15 @@
   .bg-gold { background-color: hsl(var(--gold)); }
   .bg-gold-soft { background-color: hsl(var(--gold-soft)); }
 }
+
+@media print {
+  body { background: white !important; }
+  aside, header, .print\:hidden { display: none !important; }
+  main { padding: 0 !important; overflow: visible !important; }
+  [role="tablist"] { display: none !important; }
+  [role="tabpanel"] { display: block !important; opacity: 1 !important; }
+  [role="tabpanel"][hidden] { display: block !important; }
+  .shadow-soft, .shadow-elegant, .shadow-gold { box-shadow: none !important; }
+  .border-l-4 { border-left-width: 2px !important; }
+  @page { margin: 1.5cm; }
+}

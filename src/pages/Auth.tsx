@@ -6,14 +6,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Stethoscope } from "lucide-react";
 
-const schema = z.object({
+const signinSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
+});
+
+const requestSchema = z.object({
+  full_name: z.string().trim().min(2, "Informe seu nome").max(120),
+  email: z.string().trim().email("E-mail inválido").max(255),
+  password: z.string().min(6, "Mínimo 6 caracteres").max(72),
+  reason: z.string().trim().max(500).optional(),
 });
 
 const Auth = () => {
@@ -28,31 +36,46 @@ const Auth = () => {
   if (loading) return null;
   if (user) return <Navigate to="/" replace />;
 
-  const handle = async (mode: "signin" | "signup", e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const parsed = schema.safeParse({ email: fd.get("email"), password: fd.get("password") });
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
-      return;
-    }
+    const parsed = signinSchema.safeParse({ email: fd.get("email"), password: fd.get("password") });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     setSubmitting(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email: parsed.data.email,
-          password: parsed.data.password,
-          options: { emailRedirectTo: `${window.location.origin}/` },
-        });
-        if (error) throw error;
-        toast.success("Conta criada! Verifique seu e-mail se a confirmação estiver ativa.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword(parsed.data);
-        if (error) throw error;
-        navigate("/");
-      }
+      const { error } = await supabase.auth.signInWithPassword(parsed.data);
+      if (error) throw error;
+      navigate("/");
     } catch (err: any) {
-      toast.error(err.message || "Erro ao autenticar");
+      toast.error(err.message || "Erro ao entrar");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRequest = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const parsed = requestSchema.safeParse({
+      full_name: fd.get("full_name"),
+      email: fd.get("email"),
+      password: fd.get("password"),
+      reason: fd.get("reason") || undefined,
+    });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("signup_requests").insert({
+        full_name: parsed.data.full_name,
+        email: parsed.data.email,
+        password_hash: parsed.data.password,
+        reason: parsed.data.reason ?? null,
+      });
+      if (error) throw error;
+      toast.success("Solicitação enviada! Aguarde a autorização do administrador.");
+      (e.target as HTMLFormElement).reset();
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao enviar solicitação");
     } finally {
       setSubmitting(false);
     }
@@ -72,10 +95,10 @@ const Auth = () => {
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2 w-full mb-6">
               <TabsTrigger value="signin">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Criar conta</TabsTrigger>
+              <TabsTrigger value="request">Solicitar acesso</TabsTrigger>
             </TabsList>
             <TabsContent value="signin">
-              <form onSubmit={(e) => handle("signin", e)} className="space-y-4">
+              <form onSubmit={handleSignin} className="space-y-4">
                 <div><Label htmlFor="email">E-mail</Label><Input id="email" name="email" type="email" required /></div>
                 <div><Label htmlFor="password">Senha</Label><Input id="password" name="password" type="password" required /></div>
                 <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
@@ -83,12 +106,17 @@ const Auth = () => {
                 </Button>
               </form>
             </TabsContent>
-            <TabsContent value="signup">
-              <form onSubmit={(e) => handle("signup", e)} className="space-y-4">
-                <div><Label htmlFor="email2">E-mail</Label><Input id="email2" name="email" type="email" required /></div>
-                <div><Label htmlFor="password2">Senha</Label><Input id="password2" name="password" type="password" required /></div>
+            <TabsContent value="request">
+              <form onSubmit={handleRequest} className="space-y-4">
+                <p className="text-xs text-muted-foreground">
+                  Sua solicitação será analisada pelo administrador. Após a aprovação, você poderá entrar normalmente com o e-mail e a senha cadastrados.
+                </p>
+                <div><Label htmlFor="full_name">Nome completo</Label><Input id="full_name" name="full_name" required /></div>
+                <div><Label htmlFor="email_r">E-mail</Label><Input id="email_r" name="email" type="email" required /></div>
+                <div><Label htmlFor="password_r">Senha desejada</Label><Input id="password_r" name="password" type="password" required minLength={6} /></div>
+                <div><Label htmlFor="reason">Motivo (opcional)</Label><Textarea id="reason" name="reason" rows={3} /></div>
                 <Button type="submit" disabled={submitting} className="w-full bg-gold text-primary hover:bg-gold/90">
-                  {submitting ? "Criando..." : "Criar conta"}
+                  {submitting ? "Enviando..." : "Solicitar acesso"}
                 </Button>
               </form>
             </TabsContent>

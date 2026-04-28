@@ -20,6 +20,7 @@ export type Database = {
           duration_minutes: number
           id: string
           notes: string | null
+          owner_id: string
           patient_id: string
           scheduled_at: string
           status: Database["public"]["Enums"]["appointment_status"]
@@ -30,6 +31,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          owner_id?: string
           patient_id: string
           scheduled_at: string
           status?: Database["public"]["Enums"]["appointment_status"]
@@ -40,6 +42,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          owner_id?: string
           patient_id?: string
           scheduled_at?: string
           status?: Database["public"]["Enums"]["appointment_status"]
@@ -63,6 +66,7 @@ export type Database = {
           description: string
           id: string
           notes: string | null
+          owner_id: string
           spent_at: string
         }
         Insert: {
@@ -72,6 +76,7 @@ export type Database = {
           description: string
           id?: string
           notes?: string | null
+          owner_id?: string
           spent_at?: string
         }
         Update: {
@@ -81,6 +86,7 @@ export type Database = {
           description?: string
           id?: string
           notes?: string | null
+          owner_id?: string
           spent_at?: string
         }
         Relationships: []
@@ -93,6 +99,7 @@ export type Database = {
           min_quantity: number
           name: string
           notes: string | null
+          owner_id: string
           quantity: number
           unit: string
           unit_price: number
@@ -105,6 +112,7 @@ export type Database = {
           min_quantity?: number
           name: string
           notes?: string | null
+          owner_id?: string
           quantity?: number
           unit?: string
           unit_price?: number
@@ -117,6 +125,7 @@ export type Database = {
           min_quantity?: number
           name?: string
           notes?: string | null
+          owner_id?: string
           quantity?: number
           unit?: string
           unit_price?: number
@@ -131,6 +140,7 @@ export type Database = {
           item_id: string
           moved_at: string
           movement_type: Database["public"]["Enums"]["movement_type"]
+          owner_id: string
           quantity: number
           reason: string | null
         }
@@ -140,6 +150,7 @@ export type Database = {
           item_id: string
           moved_at?: string
           movement_type: Database["public"]["Enums"]["movement_type"]
+          owner_id?: string
           quantity: number
           reason?: string | null
         }
@@ -149,6 +160,7 @@ export type Database = {
           item_id?: string
           moved_at?: string
           movement_type?: Database["public"]["Enums"]["movement_type"]
+          owner_id?: string
           quantity?: number
           reason?: string | null
         }
@@ -168,6 +180,7 @@ export type Database = {
           email: string | null
           id: string
           name: string
+          owner_id: string
           phone: string | null
           updated_at: string
         }
@@ -176,6 +189,7 @@ export type Database = {
           email?: string | null
           id?: string
           name: string
+          owner_id?: string
           phone?: string | null
           updated_at?: string
         }
@@ -184,6 +198,7 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string
+          owner_id?: string
           phone?: string | null
           updated_at?: string
         }
@@ -197,6 +212,7 @@ export type Database = {
           id: string
           method: Database["public"]["Enums"]["payment_method"]
           notes: string | null
+          owner_id: string
           paid_at: string
           patient_id: string
         }
@@ -207,6 +223,7 @@ export type Database = {
           id?: string
           method: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
+          owner_id?: string
           paid_at?: string
           patient_id: string
         }
@@ -217,6 +234,7 @@ export type Database = {
           id?: string
           method?: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
+          owner_id?: string
           paid_at?: string
           patient_id?: string
         }

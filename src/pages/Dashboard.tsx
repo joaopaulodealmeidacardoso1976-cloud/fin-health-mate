@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [range, setRange] = useState<Range>("month");
   const [stats, setStats] = useState({ revenue: 0, expenses: 0, profit: 0, patientsCount: 0, appointmentsCount: 0, attendedCount: 0 });
   const [series, setSeries] = useState<{ label: string; receita: number; despesa: number }[]>([]);
+  const [attendanceSeries, setAttendanceSeries] = useState<{ label: string; atendidos: number; faltosos: number }[]>([]);
   const [methodData, setMethodData] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {

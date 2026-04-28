@@ -9,13 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Paperclip, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface Expense {
-  id: string; description: string; category: string; amount: number; spent_at: string; notes: string | null;
+  id: string; description: string; category: string; amount: number; spent_at: string; notes: string | null; invoice_url: string | null;
 }
 
 const catLabel: Record<string, string> = { materials: "Materiais", cleaning: "Limpeza", salaries: "Salários", rent: "Aluguel", utilities: "Contas", other: "Outros" };
@@ -26,6 +26,8 @@ const Expenses = () => {
   const [list, setList] = useState<Expense[]>([]);
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState("materials");
+  const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => { document.title = "Despesas | Painel Clínico"; load(); }, []);
 
@@ -42,15 +44,42 @@ const Expenses = () => {
     const date = fd.get("date") as string;
     const notes = (fd.get("notes") as string) || null;
     if (!description || !amount || amount <= 0) { toast.error("Preencha descrição e valor"); return; }
+    if (invoiceFile && invoiceFile.size > 10 * 1024 * 1024) { toast.error("A nota fiscal deve ter até 10MB"); return; }
     const spent_at = date ? new Date(date).toISOString() : new Date().toISOString();
-    const { error } = await supabase.from("expenses").insert({ description, amount, category: category as any, spent_at, notes });
-    if (error) toast.error(error.message); else { toast.success("Despesa registrada"); setOpen(false); load(); }
+
+    setSubmitting(true);
+    let invoice_url: string | null = null;
+    if (invoiceFile) {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) { setSubmitting(false); toast.error("Sessão expirada"); return; }
+      const ext = invoiceFile.name.split(".").pop() || "bin";
+      const path = `${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("invoices").upload(path, invoiceFile, { contentType: invoiceFile.type });
+      if (upErr) { setSubmitting(false); toast.error("Falha no upload da nota: " + upErr.message); return; }
+      invoice_url = path;
+    }
+
+    const { error } = await supabase.from("expenses").insert({ description, amount, category: category as any, spent_at, notes, invoice_url });
+    setSubmitting(false);
+    if (error) toast.error(error.message);
+    else { toast.success("Despesa registrada"); setOpen(false); setInvoiceFile(null); load(); }
   };
 
   const remove = async (id: string) => {
     if (!confirm("Excluir esta despesa?")) return;
+    const target = list.find((x) => x.id === id);
+    if (target?.invoice_url) {
+      await supabase.storage.from("invoices").remove([target.invoice_url]);
+    }
     const { error } = await supabase.from("expenses").delete().eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Removida"); load(); }
+  };
+
+  const openInvoice = async (path: string) => {
+    const { data, error } = await supabase.storage.from("invoices").createSignedUrl(path, 60);
+    if (error || !data?.signedUrl) { toast.error("Não foi possível abrir o anexo"); return; }
+    window.open(data.signedUrl, "_blank", "noopener");
   };
 
   const now = new Date();
@@ -66,7 +95,7 @@ const Expenses = () => {
 
       <div className="flex justify-between items-center">
         <h2 className="font-display text-xl">Lançamentos</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setInvoiceFile(null); }}>
           <DialogTrigger asChild>
             <Button className="bg-primary text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Nova despesa</Button>
           </DialogTrigger>
@@ -88,7 +117,25 @@ const Expenses = () => {
                 </Select>
               </div>
               <div><Label>Observações</Label><Textarea name="notes" rows={2} /></div>
-              <DialogFooter><Button type="submit" className="bg-gold text-primary hover:bg-gold/90">Salvar</Button></DialogFooter>
+              <div>
+                <Label>Nota fiscal (opcional)</Label>
+                <Input
+                  type="file"
+                  accept="application/pdf,image/png,image/jpeg,image/webp"
+                  onChange={(e) => setInvoiceFile(e.target.files?.[0] ?? null)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">PDF ou imagem, até 10MB.</p>
+                {invoiceFile && (
+                  <p className="text-xs mt-1 flex items-center gap-1 text-muted-foreground">
+                    <Paperclip className="h-3 w-3" />{invoiceFile.name}
+                  </p>
+                )}
+              </div>
+              <DialogFooter>
+                <Button type="submit" disabled={submitting} className="bg-gold text-primary hover:bg-gold/90">
+                  {submitting ? "Salvando..." : "Salvar"}
+                </Button>
+              </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
@@ -97,16 +144,25 @@ const Expenses = () => {
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
-            <TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Descrição</TableHead><TableHead>Categoria</TableHead><TableHead className="text-right">Valor</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Descrição</TableHead><TableHead>Categoria</TableHead><TableHead className="text-right">Valor</TableHead><TableHead>NF</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
             <TableBody>
               {list.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-12">Nenhuma despesa</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">Nenhuma despesa</TableCell></TableRow>
               ) : list.map((e) => (
                 <TableRow key={e.id}>
                   <TableCell>{format(new Date(e.spent_at), "dd/MM/yy")}</TableCell>
                   <TableCell className="font-medium">{e.description}</TableCell>
                   <TableCell><Badge variant="outline">{catLabel[e.category]}</Badge></TableCell>
                   <TableCell className="text-right font-medium text-destructive">{fmt(Number(e.amount))}</TableCell>
+                  <TableCell>
+                    {e.invoice_url ? (
+                      <Button size="sm" variant="ghost" onClick={() => openInvoice(e.invoice_url!)} className="h-8 px-2">
+                        <FileText className="h-4 w-4 mr-1" />Ver
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
                   <TableCell><Button size="icon" variant="ghost" onClick={() => remove(e.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                 </TableRow>
               ))}

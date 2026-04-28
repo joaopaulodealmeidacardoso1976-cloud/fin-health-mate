@@ -154,6 +154,26 @@ const Dashboard = () => {
 
       <Card className="shadow-soft">
         <CardHeader>
+          <CardTitle className="font-display">Atendidos vs. Faltosos</CardTitle>
+          <CardDescription>Comparativo de comparecimento no período</CardDescription>
+        </CardHeader>
+        <CardContent className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={attendanceSeries}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 88%)" />
+              <XAxis dataKey="label" stroke="hsl(220, 9%, 46%)" fontSize={12} />
+              <YAxis stroke="hsl(220, 9%, 46%)" fontSize={12} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "hsl(0,0%,100%)", border: "1px solid hsl(40,15%,88%)", borderRadius: 8 }} />
+              <Legend />
+              <Bar dataKey="atendidos" name="Atendidos" fill="hsl(38, 45%, 58%)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="faltosos" name="Faltosos" fill="hsl(220, 13%, 35%)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-soft">
+        <CardHeader>
           <CardTitle className="font-display">Pacientes no sistema</CardTitle>
           <CardDescription>Total cadastrado</CardDescription>
         </CardHeader>

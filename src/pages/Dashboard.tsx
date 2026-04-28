@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
-  PieChart, Pie, Cell, Legend,
+  PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from "recharts";
 import { startOfWeek, startOfMonth, startOfYear, format, eachDayOfInterval, eachMonthOfInterval, endOfMonth, endOfYear, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [range, setRange] = useState<Range>("month");
   const [stats, setStats] = useState({ revenue: 0, expenses: 0, profit: 0, patientsCount: 0, appointmentsCount: 0, attendedCount: 0 });
   const [series, setSeries] = useState<{ label: string; receita: number; despesa: number }[]>([]);
+  const [attendanceSeries, setAttendanceSeries] = useState<{ label: string; atendidos: number; faltosos: number }[]>([]);
   const [methodData, setMethodData] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
@@ -53,6 +54,18 @@ const Dashboard = () => {
       (pays ?? []).forEach((p: any) => { const k = keyFn(new Date(p.paid_at)); initBucket(k); buckets[k].receita += Number(p.amount); });
       (exps ?? []).forEach((e: any) => { const k = keyFn(new Date(e.spent_at)); initBucket(k); buckets[k].despesa += Number(e.amount); });
       setSeries(Object.entries(buckets).map(([label, v]) => ({ label, ...v })));
+
+      // Attendance buckets (atendidos vs faltosos)
+      const attBuckets: Record<string, { atendidos: number; faltosos: number }> = {};
+      const initAtt = (key: string) => { if (!attBuckets[key]) attBuckets[key] = { atendidos: 0, faltosos: 0 }; };
+      intervals.forEach((d) => initAtt(keyFn(d)));
+      (appts ?? []).forEach((a: any) => {
+        const k = keyFn(new Date(a.scheduled_at));
+        initAtt(k);
+        if (a.status === "attended") attBuckets[k].atendidos += 1;
+        else if (a.status === "missed") attBuckets[k].faltosos += 1;
+      });
+      setAttendanceSeries(Object.entries(attBuckets).map(([label, v]) => ({ label, ...v })));
 
       // Methods pie
       const methodLabels: Record<string, string> = { credit_card: "Crédito", debit_card: "Débito", pix: "Pix", cash: "Dinheiro" };
@@ -138,6 +151,26 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="shadow-soft">
+        <CardHeader>
+          <CardTitle className="font-display">Atendidos vs. Faltosos</CardTitle>
+          <CardDescription>Comparativo de comparecimento no período</CardDescription>
+        </CardHeader>
+        <CardContent className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={attendanceSeries}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 88%)" />
+              <XAxis dataKey="label" stroke="hsl(220, 9%, 46%)" fontSize={12} />
+              <YAxis stroke="hsl(220, 9%, 46%)" fontSize={12} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "hsl(0,0%,100%)", border: "1px solid hsl(40,15%,88%)", borderRadius: 8 }} />
+              <Legend />
+              <Bar dataKey="atendidos" name="Atendidos" fill="hsl(38, 45%, 58%)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="faltosos" name="Faltosos" fill="hsl(220, 13%, 35%)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       <Card className="shadow-soft">
         <CardHeader>

@@ -65,6 +65,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          invoice_url: string | null
           notes: string | null
           owner_id: string
           spent_at: string
@@ -75,6 +76,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          invoice_url?: string | null
           notes?: string | null
           owner_id?: string
           spent_at?: string
@@ -85,6 +87,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          invoice_url?: string | null
           notes?: string | null
           owner_id?: string
           spent_at?: string

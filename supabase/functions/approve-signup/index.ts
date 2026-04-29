@@ -5,6 +5,23 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const findUserByEmail = async (admin: ReturnType<typeof createClient>, email: string) => {
+  const target = email.trim().toLowerCase();
+  let page = 1;
+
+  while (page <= 10) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw error;
+
+    const found = data.users.find((u) => u.email?.trim().toLowerCase() === target);
+    if (found) return found;
+    if (data.users.length < 1000) break;
+    page += 1;
+  }
+
+  return null;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -69,20 +86,57 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Approve: create the user already confirmed
+    // Approve: create the user already confirmed. If the email already exists,
+    // reuse that auth user and grant access instead of blocking the approval.
     const { data: created, error: createErr } = await admin.auth.admin.createUser({
       email: reqRow.email,
       password: reqRow.password_hash, // stored plain (encrypted at rest); used once to create user
       email_confirm: true,
       user_metadata: { full_name: reqRow.full_name },
     });
+    let approvedUser = created.user;
+
     if (createErr) {
+      const alreadyExists = createErr.message.toLowerCase().includes("already") || createErr.message.toLowerCase().includes("registered");
+      if (!alreadyExists) {
+        return new Response(JSON.stringify({ error: createErr.message }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      approvedUser = await findUserByEmail(admin, reqRow.email);
+      if (!approvedUser) {
+        return new Response(JSON.stringify({ error: "Usuário já existe, mas não foi possível localizá-lo para liberar o acesso." }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { error: updateErr } = await admin.auth.admin.updateUserById(approvedUser.id, {
+        password: reqRow.password_hash,
+        email_confirm: true,
+        user_metadata: { ...(approvedUser.user_metadata ?? {}), full_name: reqRow.full_name },
+      });
+      if (updateErr) {
+        return new Response(JSON.stringify({ error: updateErr.message }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    if (!approvedUser) {
       return new Response(JSON.stringify({ error: createErr.message }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    await admin.from("user_roles").insert({ user_id: created.user!.id, role: "user" });
+    const { error: roleErr } = await admin
+      .from("user_roles")
+      .upsert({ user_id: approvedUser.id, role: "user" }, { onConflict: "user_id,role" });
+    if (roleErr) {
+      return new Response(JSON.stringify({ error: roleErr.message }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     await admin.from("signup_requests").update({
       status: "approved",
@@ -91,7 +145,7 @@ Deno.serve(async (req) => {
       password_hash: "", // clear stored password after use
     }).eq("id", request_id);
 
-    return new Response(JSON.stringify({ ok: true, user_id: created.user!.id }), {
+    return new Response(JSON.stringify({ ok: true, user_id: approvedUser.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

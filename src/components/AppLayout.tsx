@@ -29,7 +29,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
   const current = nav.find((n) => n.end ? location.pathname === n.to : location.pathname.startsWith(n.to));
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="h-screen flex w-full bg-background overflow-hidden">
       <aside className="hidden md:flex w-64 flex-col bg-sidebar border-r border-sidebar-border">
         <div className="px-6 py-6 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             </Button>
           </div>
         </header>
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 min-h-0 p-6 overflow-auto flex flex-col">{children}</main>
       </div>
     </div>
   );

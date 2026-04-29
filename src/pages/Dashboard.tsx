@@ -130,22 +130,22 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle className="font-display">Formas de pagamento</CardTitle>
-            <CardDescription>Distribuição no período</CardDescription>
+        <Card className="shadow-soft flex flex-col min-h-0">
+          <CardHeader className="py-3">
+            <CardTitle className="font-display text-base">Formas de pagamento</CardTitle>
+            <CardDescription className="text-xs">Distribuição no período</CardDescription>
           </CardHeader>
-          <CardContent className="h-80">
+          <CardContent className="flex-1 min-h-0 pb-3">
             {methodData.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center pt-16">Sem pagamentos no período</p>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={methodData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} paddingAngle={2}>
+                  <Pie data={methodData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={70} paddingAngle={2}>
                     {methodData.map((_, i) => <Cell key={i} fill={goldShades[i % goldShades.length]} />)}
                   </Pie>
                   <Tooltip formatter={(v: any) => fmt(Number(v))} />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -153,38 +153,23 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <Card className="shadow-soft">
-        <CardHeader>
-          <CardTitle className="font-display">Atendidos vs. Faltosos</CardTitle>
-          <CardDescription>Comparativo de comparecimento no período</CardDescription>
+      <Card className="shadow-soft flex flex-col min-h-0 flex-1">
+        <CardHeader className="py-3">
+          <CardTitle className="font-display text-base">Atendidos vs. Faltosos</CardTitle>
+          <CardDescription className="text-xs">Comparativo de comparecimento no período</CardDescription>
         </CardHeader>
-        <CardContent className="h-80">
+        <CardContent className="flex-1 min-h-0 pb-3">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={attendanceSeries}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 88%)" />
               <XAxis dataKey="label" stroke="hsl(220, 9%, 46%)" fontSize={12} />
               <YAxis stroke="hsl(220, 9%, 46%)" fontSize={12} allowDecimals={false} />
               <Tooltip contentStyle={{ background: "hsl(0,0%,100%)", border: "1px solid hsl(40,15%,88%)", borderRadius: 8 }} />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="atendidos" name="Atendidos" fill="hsl(38, 45%, 58%)" radius={[4, 4, 0, 0]} />
               <Bar dataKey="faltosos" name="Faltosos" fill="hsl(220, 13%, 35%)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-soft">
-        <CardHeader>
-          <CardTitle className="font-display">Pacientes no sistema</CardTitle>
-          <CardDescription>Total cadastrado</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-gold-soft flex items-center justify-center">
-              <Users className="h-6 w-6 text-gold-deep" />
-            </div>
-            <p className="text-3xl font-display">{stats.patientsCount}</p>
-          </div>
         </CardContent>
       </Card>
     </div>
@@ -193,13 +178,13 @@ const Dashboard = () => {
 
 const KpiCard = ({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent?: "gold" | "success" | "destructive" }) => (
   <Card className="shadow-soft">
-    <CardContent className="pt-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
-          <p className={`text-2xl font-display mt-2 ${accent === "destructive" ? "text-destructive" : accent === "success" ? "text-success" : accent === "gold" ? "text-gold-deep" : ""}`}>{value}</p>
+    <CardContent className="p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">{label}</p>
+          <p className={`text-base lg:text-lg font-display mt-1 truncate ${accent === "destructive" ? "text-destructive" : accent === "success" ? "text-success" : accent === "gold" ? "text-gold-deep" : ""}`}>{value}</p>
         </div>
-        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${accent === "gold" ? "bg-gold-soft text-gold-deep" : "bg-muted text-muted-foreground"}`}>
+        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${accent === "gold" ? "bg-gold-soft text-gold-deep" : "bg-muted text-muted-foreground"} [&_svg]:h-4 [&_svg]:w-4`}>
           {icon}
         </div>
       </div>

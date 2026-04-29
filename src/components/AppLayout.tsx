@@ -37,7 +37,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
               <Stethoscope className="h-5 w-5 text-gold-deep" />
             </div>
             <div>
-              <p className="font-display text-xl leading-none whitespace-pre">DADOSTOP&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CLINIC</p>
+              <p className="font-display text-xl leading-none">DADOSTOP CLINIC</p>
               <p className="text-xs text-muted-foreground mt-1">Painel de gestão</p>
             </div>
           </div>

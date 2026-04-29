@@ -78,11 +78,11 @@ const Dashboard = () => {
   const goldShades = ["hsl(38, 45%, 58%)", "hsl(36, 40%, 45%)", "hsl(40, 50%, 70%)", "hsl(220, 13%, 35%)"];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-3 max-w-7xl mx-auto h-full">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground">Acompanhe receitas, despesas e desempenho</p>
+        <p className="text-sm text-muted-foreground">Acompanhe receitas, despesas e desempenho</p>
         <Select value={range} onValueChange={(v) => setRange(v as Range)}>
-          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-40 h-9"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="week">Esta semana</SelectItem>
             <SelectItem value="month">Este mês</SelectItem>
@@ -91,21 +91,22 @@ const Dashboard = () => {
         </Select>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         <KpiCard icon={<Wallet />} label="Receita" value={fmt(stats.revenue)} accent="gold" />
         <KpiCard icon={<TrendingUp />} label="Lucro bruto" value={fmt(stats.revenue)} accent="success" />
         <KpiCard icon={<TrendingDown />} label="Despesas" value={fmt(stats.expenses)} />
         <KpiCard icon={<DollarSign />} label="Lucro líquido" value={fmt(stats.profit)} accent={stats.profit >= 0 ? "success" : "destructive"} />
         <KpiCard icon={<CalendarCheck />} label="Atendidos" value={`${stats.attendedCount} / ${stats.appointmentsCount}`} />
+        <KpiCard icon={<Users />} label="Pacientes" value={String(stats.patientsCount)} accent="gold" />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2 shadow-soft">
-          <CardHeader>
-            <CardTitle className="font-display">Receita vs. Despesa</CardTitle>
-            <CardDescription>Evolução no período selecionado</CardDescription>
+      <div className="grid gap-3 lg:grid-cols-3 flex-1 min-h-0">
+        <Card className="lg:col-span-2 shadow-soft flex flex-col min-h-0">
+          <CardHeader className="py-3">
+            <CardTitle className="font-display text-base">Receita vs. Despesa</CardTitle>
+            <CardDescription className="text-xs">Evolução no período selecionado</CardDescription>
           </CardHeader>
-          <CardContent className="h-80">
+          <CardContent className="flex-1 min-h-0 pb-3">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={series}>
                 <defs>

@@ -80,7 +80,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             </Button>
           </div>
         </header>
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 min-h-0 p-6 overflow-auto flex flex-col">{children}</main>
       </div>
     </div>
   );

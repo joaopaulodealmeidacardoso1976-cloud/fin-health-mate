@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      anamnesis: {
+        Row: {
+          allergies: string | null
+          chief_complaint: string | null
+          chronic_conditions: string | null
+          created_at: string
+          family_history: string | null
+          habits: string | null
+          hda: string | null
+          id: string
+          medications: string | null
+          owner_id: string
+          past_history: string | null
+          record_id: string
+          updated_at: string
+        }
+        Insert: {
+          allergies?: string | null
+          chief_complaint?: string | null
+          chronic_conditions?: string | null
+          created_at?: string
+          family_history?: string | null
+          habits?: string | null
+          hda?: string | null
+          id?: string
+          medications?: string | null
+          owner_id?: string
+          past_history?: string | null
+          record_id: string
+          updated_at?: string
+        }
+        Update: {
+          allergies?: string | null
+          chief_complaint?: string | null
+          chronic_conditions?: string | null
+          created_at?: string
+          family_history?: string | null
+          habits?: string | null
+          hda?: string | null
+          id?: string
+          medications?: string | null
+          owner_id?: string
+          past_history?: string | null
+          record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anamnesis_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           created_at: string
@@ -54,6 +110,227 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          patient_id: string | null
+          record_id: string | null
+          section: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          patient_id?: string | null
+          record_id?: string | null
+          section: string
+          user_id?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          patient_id?: string | null
+          record_id?: string | null
+          section?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      clinical_evolution: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          noted_at: string
+          owner_id: string
+          professional: string | null
+          record_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note: string
+          noted_at?: string
+          owner_id?: string
+          professional?: string | null
+          record_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          noted_at?: string
+          owner_id?: string
+          professional?: string | null
+          record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinical_evolution_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clinical_exams: {
+        Row: {
+          blood_pressure: string | null
+          created_at: string
+          dental_chart: Json | null
+          exam_date: string
+          heart_rate: number | null
+          height: number | null
+          id: string
+          observations: string | null
+          owner_id: string
+          record_id: string
+          spo2: number | null
+          temperature: number | null
+          updated_at: string
+          weight: number | null
+        }
+        Insert: {
+          blood_pressure?: string | null
+          created_at?: string
+          dental_chart?: Json | null
+          exam_date?: string
+          heart_rate?: number | null
+          height?: number | null
+          id?: string
+          observations?: string | null
+          owner_id?: string
+          record_id: string
+          spo2?: number | null
+          temperature?: number | null
+          updated_at?: string
+          weight?: number | null
+        }
+        Update: {
+          blood_pressure?: string | null
+          created_at?: string
+          dental_chart?: Json | null
+          exam_date?: string
+          heart_rate?: number | null
+          height?: number | null
+          id?: string
+          observations?: string | null
+          owner_id?: string
+          record_id?: string
+          spo2?: number | null
+          temperature?: number | null
+          updated_at?: string
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinical_exams_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnoses: {
+        Row: {
+          cid_code: string | null
+          created_at: string
+          id: string
+          owner_id: string
+          primary_diagnosis: string
+          record_id: string
+          risk: Database["public"]["Enums"]["risk_level"] | null
+          secondary_diagnoses: Json | null
+          updated_at: string
+        }
+        Insert: {
+          cid_code?: string | null
+          created_at?: string
+          id?: string
+          owner_id?: string
+          primary_diagnosis: string
+          record_id: string
+          risk?: Database["public"]["Enums"]["risk_level"] | null
+          secondary_diagnoses?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          cid_code?: string | null
+          created_at?: string
+          id?: string
+          owner_id?: string
+          primary_diagnosis?: string
+          record_id?: string
+          risk?: Database["public"]["Enums"]["risk_level"] | null
+          secondary_diagnoses?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnoses_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_requests: {
+        Row: {
+          created_at: string
+          exam_name: string
+          id: string
+          interpretation: string | null
+          owner_id: string
+          record_id: string
+          requested_at: string
+          result_filename: string | null
+          result_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          exam_name: string
+          id?: string
+          interpretation?: string | null
+          owner_id?: string
+          record_id: string
+          requested_at?: string
+          result_filename?: string | null
+          result_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          exam_name?: string
+          id?: string
+          interpretation?: string | null
+          owner_id?: string
+          record_id?: string
+          requested_at?: string
+          result_filename?: string | null
+          result_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_requests_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
             referencedColumns: ["id"]
           },
         ]
@@ -177,10 +454,42 @@ export type Database = {
           },
         ]
       }
-      patients: {
+      medical_records: {
         Row: {
           created_at: string
+          id: string
+          owner_id: string
+          patient_id: string
+          record_type: Database["public"]["Enums"]["record_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+          patient_id: string
+          record_type?: Database["public"]["Enums"]["record_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+          patient_id?: string
+          record_type?: Database["public"]["Enums"]["record_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      patients: {
+        Row: {
+          address: string | null
+          birth_date: string | null
+          cpf: string | null
+          created_at: string
           email: string | null
+          emergency_contact: string | null
+          gender: string | null
           id: string
           name: string
           owner_id: string
@@ -188,8 +497,13 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          birth_date?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
+          emergency_contact?: string | null
+          gender?: string | null
           id?: string
           name: string
           owner_id?: string
@@ -197,8 +511,13 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          birth_date?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
+          emergency_contact?: string | null
+          gender?: string | null
           id?: string
           name?: string
           owner_id?: string
@@ -258,6 +577,88 @@ export type Database = {
           },
         ]
       }
+      prescription_items: {
+        Row: {
+          created_at: string
+          dosage: string | null
+          duration: string | null
+          frequency: string | null
+          id: string
+          instructions: string | null
+          medication: string
+          owner_id: string
+          prescription_id: string
+        }
+        Insert: {
+          created_at?: string
+          dosage?: string | null
+          duration?: string | null
+          frequency?: string | null
+          id?: string
+          instructions?: string | null
+          medication: string
+          owner_id?: string
+          prescription_id: string
+        }
+        Update: {
+          created_at?: string
+          dosage?: string | null
+          duration?: string | null
+          frequency?: string | null
+          id?: string
+          instructions?: string | null
+          medication?: string
+          owner_id?: string
+          prescription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescription_items_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prescriptions: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          owner_id: string
+          prescribed_at: string
+          professional: string | null
+          record_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          prescribed_at?: string
+          professional?: string | null
+          record_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          prescribed_at?: string
+          professional?: string | null
+          record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -284,6 +685,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      record_attachments: {
+        Row: {
+          category: string | null
+          file_name: string
+          file_type: string | null
+          file_url: string
+          id: string
+          owner_id: string
+          record_id: string
+          uploaded_at: string
+        }
+        Insert: {
+          category?: string | null
+          file_name: string
+          file_type?: string | null
+          file_url: string
+          id?: string
+          owner_id?: string
+          record_id: string
+          uploaded_at?: string
+        }
+        Update: {
+          category?: string | null
+          file_name?: string
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          owner_id?: string
+          record_id?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "record_attachments_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       signup_requests: {
         Row: {
@@ -320,6 +762,94 @@ export type Database = {
           status?: Database["public"]["Enums"]["signup_status"]
         }
         Relationships: []
+      }
+      therapeutic_plans: {
+        Row: {
+          care_plan: string | null
+          created_at: string
+          frequency: string | null
+          id: string
+          interventions: string | null
+          objectives: string | null
+          owner_id: string
+          professionals: string | null
+          record_id: string
+          updated_at: string
+        }
+        Insert: {
+          care_plan?: string | null
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          interventions?: string | null
+          objectives?: string | null
+          owner_id?: string
+          professionals?: string | null
+          record_id: string
+          updated_at?: string
+        }
+        Update: {
+          care_plan?: string | null
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          interventions?: string | null
+          objectives?: string | null
+          owner_id?: string
+          professionals?: string | null
+          record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapeutic_plans_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treatments: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          owner_id: string
+          performed_at: string
+          procedure: string
+          professional: string | null
+          record_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          performed_at?: string
+          procedure: string
+          professional?: string | null
+          record_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          performed_at?: string
+          procedure?: string
+          professional?: string | null
+          record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatments_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "medical_records"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -367,6 +897,8 @@ export type Database = {
         | "other"
       movement_type: "in" | "out"
       payment_method: "credit_card" | "debit_card" | "pix" | "cash"
+      record_type: "medical" | "dental"
+      risk_level: "low" | "medium" | "high"
       signup_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -507,6 +1039,8 @@ export const Constants = {
       ],
       movement_type: ["in", "out"],
       payment_method: ["credit_card", "debit_card", "pix", "cash"],
+      record_type: ["medical", "dental"],
+      risk_level: ["low", "medium", "high"],
       signup_status: ["pending", "approved", "rejected"],
     },
   },

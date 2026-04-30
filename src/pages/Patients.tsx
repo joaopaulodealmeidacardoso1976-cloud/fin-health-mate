@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, FolderOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -90,6 +91,9 @@ const Patients = () => {
                   <TableCell>{p.phone ?? "—"}</TableCell>
                   <TableCell>{p.email ?? "—"}</TableCell>
                   <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" asChild title="Abrir prontuário">
+                      <Link to={`/prontuarios/${p.id}`}><FolderOpen className="h-4 w-4 text-gold-deep" /></Link>
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => { setEditing(p); setOpen(true); }}><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => remove(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </TableCell>

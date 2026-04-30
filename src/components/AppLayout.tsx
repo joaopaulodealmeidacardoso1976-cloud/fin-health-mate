@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell, Package, FileText, ShieldCheck,
+  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell, Package, FileText, ShieldCheck, FolderHeart,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -12,6 +12,7 @@ import AlertsBell from "@/components/AlertsBell";
 const baseNav = [
   { to: "/", label: "Visão geral", icon: LayoutDashboard, end: true },
   { to: "/pacientes", label: "Pacientes", icon: Users },
+  { to: "/prontuarios", label: "Prontuários", icon: FolderHeart },
   { to: "/agenda", label: "Agenda", icon: CalendarDays },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/despesas", label: "Despesas", icon: Receipt },

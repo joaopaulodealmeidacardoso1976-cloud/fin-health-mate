@@ -88,7 +88,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, re
 
   return (
     <SectionCard title="Prescrições / Receitas" icon={<FileText className="h-5 w-5" />}
-      action={!open && <Button size="sm" onClick={() => setOpen(true)} className="bg-gold text-primary hover:bg-gold/90"><Plus className="h-4 w-4 mr-1" />Nova</Button>}>
+      action={!open && <Button size="sm" onClick={openNew} className="bg-gold text-primary hover:bg-gold/90"><Plus className="h-4 w-4 mr-1" />Nova</Button>}>
       {open && (
         <div className="mb-4 p-4 bg-muted/30 rounded-lg space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

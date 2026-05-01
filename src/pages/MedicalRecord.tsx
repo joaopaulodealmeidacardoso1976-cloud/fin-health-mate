@@ -91,7 +91,7 @@ const MedicalRecord = () => {
           {active === "plan" && <TherapeuticPlan recordId={record.id} patientId={patient.id} />}
           {active === "treatment" && <Treatment recordId={record.id} patientId={patient.id} />}
           {active === "exams" && <Exams recordId={record.id} patientId={patient.id} />}
-          {active === "prescriptions" && <Prescriptions recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} />}
+          {active === "prescriptions" && <Prescriptions recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} recordType={record.record_type} />}
           {active === "evolution" && <Evolution recordId={record.id} patientId={patient.id} />}
           {active === "attachments" && <Attachments recordId={record.id} patientId={patient.id} />}
           {active === "appointments" && <AppointmentsHistory patientId={patient.id} />}

@@ -14,7 +14,9 @@ import { generatePrescriptionPdf } from "@/lib/pdf";
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }
 interface Prescription { id: string; professional: string | null; professional_registry: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
 
-export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; }) => {
+export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, recordType }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; recordType: "medical" | "dental"; }) => {
+  const registryLabel = recordType === "dental" ? "CRO" : "CRM";
+  const registryPlaceholder = recordType === "dental" ? "Ex: CRO/SP 12345" : "Ex: CRM/SP 123456";
   const [list, setList] = useState<Prescription[]>([]);
   const [open, setOpen] = useState(false);
   const [professional, setProfessional] = useState("");

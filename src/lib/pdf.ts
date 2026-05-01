@@ -5,6 +5,7 @@ export interface PrescriptionPdfInput {
   patientName: string;
   patientCpf?: string | null;
   professional?: string | null;
+  professionalRegistry?: string | null;
   prescribedAt: Date;
   items: { medication: string; dosage?: string; frequency?: string; duration?: string; instructions?: string }[];
   notes?: string | null;

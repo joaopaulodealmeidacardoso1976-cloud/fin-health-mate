@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell, Package, FileText, ShieldCheck, FolderHeart,
+  LayoutDashboard, Users, CalendarDays, Wallet, Receipt, LogOut, Stethoscope, Bell, Package, FileText, ShieldCheck, FolderHeart, UserCog,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -63,8 +63,11 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             </NavLink>
           ))}
         </nav>
-        <div className="p-4 border-t border-sidebar-border">
-          <p className="text-xs text-muted-foreground truncate mb-2">{user?.email}</p>
+        <div className="p-4 border-t border-sidebar-border space-y-2">
+          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+          <NavLink to="/perfil" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <UserCog className="h-4 w-4" />Meu perfil
+          </NavLink>
           <Button variant="ghost" size="sm" onClick={signOut} className="w-full justify-start">
             <LogOut className="h-4 w-4 mr-2" />Sair
           </Button>

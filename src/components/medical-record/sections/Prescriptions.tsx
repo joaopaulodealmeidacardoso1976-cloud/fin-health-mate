@@ -12,12 +12,13 @@ import { searchMedications } from "@/lib/medications";
 import { generatePrescriptionPdf } from "@/lib/pdf";
 
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }
-interface Prescription { id: string; professional: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
+interface Prescription { id: string; professional: string | null; professional_registry: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
 
 export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; }) => {
   const [list, setList] = useState<Prescription[]>([]);
   const [open, setOpen] = useState(false);
   const [professional, setProfessional] = useState("");
+  const [professionalRegistry, setProfessionalRegistry] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<Item[]>([{ medication:"", dosage:"", frequency:"", duration:"", instructions:"" }]);
   const [activeQuery, setActiveQuery] = useState<{ idx: number; q: string } | null>(null);

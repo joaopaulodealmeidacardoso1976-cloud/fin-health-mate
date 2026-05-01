@@ -28,8 +28,8 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
     if (!pres) { setList([]); return; }
     const ids = pres.map(p => p.id);
     const { data: itms } = ids.length ? await supabase.from("prescription_items").select("*").in("prescription_id", ids) : { data: [] };
-    setList(pres.map(p => ({
-      id: p.id, professional: p.professional, notes: p.notes, prescribed_at: p.prescribed_at,
+    setList(pres.map((p: any) => ({
+      id: p.id, professional: p.professional, professional_registry: p.professional_registry ?? null, notes: p.notes, prescribed_at: p.prescribed_at,
       items: (itms ?? []).filter(i => i.prescription_id === p.id).map(i => ({
         medication: i.medication, dosage: i.dosage ?? "", frequency: i.frequency ?? "", duration: i.duration ?? "", instructions: i.instructions ?? "",
       })),

@@ -629,6 +629,7 @@ export type Database = {
           owner_id: string
           prescribed_at: string
           professional: string | null
+          professional_registry: string | null
           record_id: string
         }
         Insert: {
@@ -638,6 +639,7 @@ export type Database = {
           owner_id?: string
           prescribed_at?: string
           professional?: string | null
+          professional_registry?: string | null
           record_id: string
         }
         Update: {
@@ -647,6 +649,7 @@ export type Database = {
           owner_id?: string
           prescribed_at?: string
           professional?: string | null
+          professional_registry?: string | null
           record_id?: string
         }
         Relationships: [

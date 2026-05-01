@@ -12,12 +12,13 @@ import { searchMedications } from "@/lib/medications";
 import { generatePrescriptionPdf } from "@/lib/pdf";
 
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }
-interface Prescription { id: string; professional: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
+interface Prescription { id: string; professional: string | null; professional_registry: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
 
 export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; }) => {
   const [list, setList] = useState<Prescription[]>([]);
   const [open, setOpen] = useState(false);
   const [professional, setProfessional] = useState("");
+  const [professionalRegistry, setProfessionalRegistry] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<Item[]>([{ medication:"", dosage:"", frequency:"", duration:"", instructions:"" }]);
   const [activeQuery, setActiveQuery] = useState<{ idx: number; q: string } | null>(null);
@@ -27,8 +28,8 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
     if (!pres) { setList([]); return; }
     const ids = pres.map(p => p.id);
     const { data: itms } = ids.length ? await supabase.from("prescription_items").select("*").in("prescription_id", ids) : { data: [] };
-    setList(pres.map(p => ({
-      id: p.id, professional: p.professional, notes: p.notes, prescribed_at: p.prescribed_at,
+    setList(pres.map((p: any) => ({
+      id: p.id, professional: p.professional, professional_registry: p.professional_registry ?? null, notes: p.notes, prescribed_at: p.prescribed_at,
       items: (itms ?? []).filter(i => i.prescription_id === p.id).map(i => ({
         medication: i.medication, dosage: i.dosage ?? "", frequency: i.frequency ?? "", duration: i.duration ?? "", instructions: i.instructions ?? "",
       })),
@@ -37,15 +38,15 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
   useEffect(() => { load(); }, [recordId]);
 
   const reset = () => {
-    setProfessional(""); setNotes(""); setItems([{ medication:"", dosage:"", frequency:"", duration:"", instructions:"" }]); setOpen(false);
+    setProfessional(""); setProfessionalRegistry(""); setNotes(""); setItems([{ medication:"", dosage:"", frequency:"", duration:"", instructions:"" }]); setOpen(false);
   };
 
   const save = async () => {
     const valid = items.filter(i => i.medication.trim());
     if (!valid.length) { toast.error("Adicione ao menos um medicamento"); return; }
     const { data: pres, error } = await supabase.from("prescriptions").insert({
-      record_id: recordId, professional: professional || null, notes: notes || null,
-    }).select().single();
+      record_id: recordId, professional: professional || null, professional_registry: professionalRegistry || null, notes: notes || null,
+    } as any).select().single();
     if (error || !pres) { toast.error(error?.message ?? "Erro"); return; }
     const itemRows = valid.map(i => ({ prescription_id: pres.id, ...i, dosage: i.dosage || null, frequency: i.frequency || null, duration: i.duration || null, instructions: i.instructions || null }));
     await supabase.from("prescription_items").insert(itemRows);
@@ -64,13 +65,13 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
     generatePrescriptionPdf({
       clinicName: "DADOSTOP CLINIC",
       patientName, patientCpf,
-      professional: p.professional, prescribedAt: new Date(p.prescribed_at),
+      professional: p.professional, professionalRegistry: p.professional_registry, prescribedAt: new Date(p.prescribed_at),
       items: p.items, notes: p.notes,
     });
   };
 
   const duplicate = (p: Prescription) => {
-    setProfessional(p.professional ?? ""); setNotes(p.notes ?? "");
+    setProfessional(p.professional ?? ""); setProfessionalRegistry(p.professional_registry ?? ""); setNotes(p.notes ?? "");
     setItems(p.items.length ? p.items : [{ medication:"", dosage:"", frequency:"", duration:"", instructions:"" }]);
     setOpen(true);
   };
@@ -82,6 +83,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
         <div className="mb-4 p-4 bg-muted/30 rounded-lg space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div><Label>Profissional</Label><Input value={professional} onChange={(e) => setProfessional(e.target.value)} /></div>
+            <div><Label>CRM / CRO</Label><Input value={professionalRegistry} onChange={(e) => setProfessionalRegistry(e.target.value)} placeholder="Ex: CRM/SP 123456" /></div>
           </div>
           {items.map((it, idx) => (
             <div key={idx} className="border border-border rounded-md p-3 space-y-2 relative">
@@ -125,7 +127,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
             <div key={p.id} className="border border-border rounded-lg p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">{new Date(p.prescribed_at).toLocaleString("pt-BR")} {p.professional && `• ${p.professional}`}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(p.prescribed_at).toLocaleString("pt-BR")} {p.professional && `• ${p.professional}`}{p.professional_registry && ` (${p.professional_registry})`}</p>
                   <ul className="mt-1 space-y-1">
                     {p.items.map((i, k) => (
                       <li key={k} className="text-sm"><span className="font-medium">{i.medication}</span> {i.dosage && `— ${i.dosage}`} {i.frequency && `• ${i.frequency}`} {i.duration && `• ${i.duration}`}</li>

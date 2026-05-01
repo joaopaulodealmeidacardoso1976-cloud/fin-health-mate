@@ -85,7 +85,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, re
         <div className="mb-4 p-4 bg-muted/30 rounded-lg space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div><Label>Profissional</Label><Input value={professional} onChange={(e) => setProfessional(e.target.value)} /></div>
-            <div><Label>CRM / CRO</Label><Input value={professionalRegistry} onChange={(e) => setProfessionalRegistry(e.target.value)} placeholder="Ex: CRM/SP 123456" /></div>
+            <div><Label>{registryLabel}</Label><Input value={professionalRegistry} onChange={(e) => setProfessionalRegistry(e.target.value)} placeholder={registryPlaceholder} /></div>
           </div>
           {items.map((it, idx) => (
             <div key={idx} className="border border-border rounded-md p-3 space-y-2 relative">

@@ -147,6 +147,45 @@ export type Database = {
         }
         Relationships: []
       }
+      clinical_documents: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          doc_type: string
+          id: string
+          issued_at: string
+          owner_id: string
+          record_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content?: string
+          created_at?: string
+          doc_type: string
+          id?: string
+          issued_at?: string
+          owner_id?: string
+          record_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          doc_type?: string
+          id?: string
+          issued_at?: string
+          owner_id?: string
+          record_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clinical_evolution: {
         Row: {
           created_at: string
@@ -335,6 +374,45 @@ export type Database = {
           },
         ]
       }
+      exercise_plans: {
+        Row: {
+          created_at: string
+          duration_weeks: number | null
+          exercises: Json
+          frequency: string | null
+          id: string
+          notes: string | null
+          owner_id: string
+          record_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_weeks?: number | null
+          exercises?: Json
+          frequency?: string | null
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          record_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_weeks?: number | null
+          exercises?: Json
+          frequency?: string | null
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          record_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -478,6 +556,42 @@ export type Database = {
           patient_id?: string
           record_type?: Database["public"]["Enums"]["record_type"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      nutrition_plans: {
+        Row: {
+          created_at: string
+          guidelines: string | null
+          id: string
+          meals: Json
+          owner_id: string
+          record_id: string
+          title: string
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          guidelines?: string | null
+          id?: string
+          meals?: Json
+          owner_id?: string
+          record_id: string
+          title?: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          guidelines?: string | null
+          id?: string
+          meals?: Json
+          owner_id?: string
+          record_id?: string
+          title?: string
+          updated_at?: string
+          valid_until?: string | null
         }
         Relationships: []
       }
@@ -662,6 +776,42 @@ export type Database = {
           },
         ]
       }
+      professional_assessments: {
+        Row: {
+          assessed_at: string
+          category: string
+          created_at: string
+          data: Json
+          id: string
+          notes: string | null
+          owner_id: string
+          record_id: string
+          updated_at: string
+        }
+        Insert: {
+          assessed_at?: string
+          category: string
+          created_at?: string
+          data?: Json
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          record_id: string
+          updated_at?: string
+        }
+        Update: {
+          assessed_at?: string
+          category?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          record_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -669,6 +819,9 @@ export type Database = {
           full_name: string | null
           id: string
           notify_email: string | null
+          professional_category: string | null
+          professional_registry: string | null
+          professional_uf: string | null
           updated_at: string
         }
         Insert: {
@@ -677,6 +830,9 @@ export type Database = {
           full_name?: string | null
           id: string
           notify_email?: string | null
+          professional_category?: string | null
+          professional_registry?: string | null
+          professional_uf?: string | null
           updated_at?: string
         }
         Update: {
@@ -685,6 +841,9 @@ export type Database = {
           full_name?: string | null
           id?: string
           notify_email?: string | null
+          professional_category?: string | null
+          professional_registry?: string | null
+          professional_uf?: string | null
           updated_at?: string
         }
         Relationships: []

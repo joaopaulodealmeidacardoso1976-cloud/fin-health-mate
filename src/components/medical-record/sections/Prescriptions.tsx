@@ -10,13 +10,15 @@ import { toast } from "sonner";
 import { logAudit } from "@/hooks/useAuditLog";
 import { searchMedications } from "@/lib/medications";
 import { generatePrescriptionPdf } from "@/lib/pdf";
+import { useProfessional } from "@/hooks/useProfessional";
 
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }
 interface Prescription { id: string; professional: string | null; professional_registry: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
 
 export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, recordType }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; recordType: "medical" | "dental"; }) => {
-  const registryLabel = recordType === "dental" ? "CRO" : "CRM";
-  const registryPlaceholder = recordType === "dental" ? "Ex: CRO/SP 12345" : "Ex: CRM/SP 123456";
+  const { profile } = useProfessional();
+  const registryLabel = profile?.meta.council ?? (recordType === "dental" ? "CRO" : "CRM");
+  const registryPlaceholder = `Ex: ${registryLabel}${profile?.uf ? `/${profile.uf}` : "/SP"} 12345`;
   const [list, setList] = useState<Prescription[]>([]);
   const [open, setOpen] = useState(false);
   const [professional, setProfessional] = useState("");
@@ -24,6 +26,12 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, re
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<Item[]>([{ medication:"", dosage:"", frequency:"", duration:"", instructions:"" }]);
   const [activeQuery, setActiveQuery] = useState<{ idx: number; q: string } | null>(null);
+
+  const openNew = () => {
+    if (profile?.fullName) setProfessional(profile.fullName);
+    if (profile?.registry) setProfessionalRegistry(`${profile.meta.council}${profile.uf ? `/${profile.uf}` : ""} ${profile.registry}`);
+    setOpen(true);
+  };
 
   const load = async () => {
     const { data: pres } = await supabase.from("prescriptions").select("*").eq("record_id", recordId).order("prescribed_at", { ascending: false });
@@ -80,7 +88,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, re
 
   return (
     <SectionCard title="Prescrições / Receitas" icon={<FileText className="h-5 w-5" />}
-      action={!open && <Button size="sm" onClick={() => setOpen(true)} className="bg-gold text-primary hover:bg-gold/90"><Plus className="h-4 w-4 mr-1" />Nova</Button>}>
+      action={!open && <Button size="sm" onClick={openNew} className="bg-gold text-primary hover:bg-gold/90"><Plus className="h-4 w-4 mr-1" />Nova</Button>}>
       {open && (
         <div className="mb-4 p-4 bg-muted/30 rounded-lg space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

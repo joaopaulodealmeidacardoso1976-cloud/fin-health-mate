@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useMedicalRecord } from "@/hooks/useMedicalRecord";
+import { useProfessional } from "@/hooks/useProfessional";
 import { RecordHeader } from "@/components/medical-record/RecordHeader";
 import { RecordSidebar, SectionId } from "@/components/medical-record/RecordSidebar";
 import { Identification } from "@/components/medical-record/sections/Identification";
@@ -16,8 +17,14 @@ import { Evolution } from "@/components/medical-record/sections/Evolution";
 import { Attachments } from "@/components/medical-record/sections/Attachments";
 import { AppointmentsHistory } from "@/components/medical-record/sections/AppointmentsHistory";
 import { AuditLog } from "@/components/medical-record/sections/AuditLog";
+import { NutritionPlan } from "@/components/medical-record/sections/NutritionPlan";
+import { ExercisePlan } from "@/components/medical-record/sections/ExercisePlan";
+import { FunctionalAssessment } from "@/components/medical-record/sections/FunctionalAssessment";
+import { ClinicalDocuments } from "@/components/medical-record/sections/ClinicalDocuments";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
+import { isSectionVisible } from "@/lib/professionalCategories";
 
 interface Patient {
   id: string; name: string; phone: string | null; email: string | null;
@@ -29,6 +36,7 @@ const MedicalRecord = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
   const { record, loading, updateType } = useMedicalRecord(patientId);
+  const { profile, loading: profileLoading } = useProfessional();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [active, setActive] = useState<SectionId>("identification");
   const [allergies, setAllergies] = useState<string | null>(null);
@@ -56,18 +64,28 @@ const MedicalRecord = () => {
     })();
   }, [record, patientId, active]);
 
-  if (loading || !record || !patient) {
+  if (loading || profileLoading || !record || !patient || !profile) {
     return <div className="flex items-center justify-center py-20 text-muted-foreground">Carregando prontuário...</div>;
   }
 
-  const isDental = record.record_type === "dental";
+  // Categoria efetiva: do profissional logado (admin pode usar a do prontuário se quiser).
+  const category = profile.category;
+  const isDental = category === "dental" || record.record_type === "dental";
+
+  // Se a seção ativa não é visível para a categoria, voltar para identificação.
+  if (!isSectionVisible(category, active)) {
+    setActive("identification");
+  }
 
   return (
     <div className="space-y-4 max-w-7xl mx-auto w-full">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
         <Button variant="ghost" size="sm" onClick={() => navigate("/prontuarios")}>
           <ArrowLeft className="h-4 w-4 mr-1" />Voltar
         </Button>
+        <Badge variant="secondary" className="text-xs">
+          {profile.meta.label}{profile.registry && ` • ${profile.meta.council}${profile.uf ? `/${profile.uf}` : ""} ${profile.registry}`}
+        </Badge>
       </div>
 
       <RecordHeader
@@ -79,9 +97,9 @@ const MedicalRecord = () => {
         recordType={record.record_type}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
         <aside className="lg:border-r lg:border-border lg:pr-4">
-          <RecordSidebar active={active} onChange={setActive} />
+          <RecordSidebar active={active} onChange={setActive} category={category} />
         </aside>
         <main className="min-w-0">
           {active === "identification" && <Identification patient={patient} record={record} onTypeChange={updateType} onPatientUpdate={loadPatient} />}
@@ -91,7 +109,11 @@ const MedicalRecord = () => {
           {active === "plan" && <TherapeuticPlan recordId={record.id} patientId={patient.id} />}
           {active === "treatment" && <Treatment recordId={record.id} patientId={patient.id} />}
           {active === "exams" && <Exams recordId={record.id} patientId={patient.id} />}
-          {active === "prescriptions" && <Prescriptions recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} recordType={record.record_type} />}
+          {active === "prescriptions" && <Prescriptions recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} recordType={isDental ? "dental" : "medical"} />}
+          {active === "nutrition_plan" && <NutritionPlan recordId={record.id} patientId={patient.id} patientName={patient.name} />}
+          {active === "exercise_plan" && <ExercisePlan recordId={record.id} patientId={patient.id} patientName={patient.name} />}
+          {active === "assessment" && <FunctionalAssessment recordId={record.id} patientId={patient.id} category={category} />}
+          {active === "documents" && <ClinicalDocuments recordId={record.id} patientId={patient.id} patientName={patient.name} category={category} />}
           {active === "evolution" && <Evolution recordId={record.id} patientId={patient.id} />}
           {active === "attachments" && <Attachments recordId={record.id} patientId={patient.id} />}
           {active === "appointments" && <AppointmentsHistory patientId={patient.id} />}

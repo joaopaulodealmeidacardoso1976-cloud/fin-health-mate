@@ -1,107 +1,109 @@
-## Prontuário do Paciente — MVP completo
+## Prontuário multi-categoria por profissional
 
-Aba digital centralizando todas as informações clínicas, com 12 seções funcionais, suporte a clínica médica e odontológica, anexos, geração de receita em PDF e auditoria.
+Hoje o prontuário só conhece dois tipos: **medical** e **dental**. Vamos expandir para **9 categorias profissionais**, com o tipo derivado do **profissional logado** (configurado no perfil), e adaptar seções, campos e documentos por categoria.
 
-### Acesso
+### Categorias e conselhos suportados
 
-- Novo item **"Prontuários"** no menu lateral → lista todos os pacientes com busca → abre o prontuário.
-- Botão **"Abrir prontuário"** na lista de Pacientes existente.
-- Rota: `/prontuarios` (lista) e `/prontuarios/:patientId` (prontuário individual).
+| Categoria | Conselho | Foco clínico principal |
+|---|---|---|
+| Médico | CRM | Anamnese geral, sinais vitais, prescrição |
+| Odontólogo | CRO | Odontograma, plano odontológico |
+| Psicólogo | CRP | Queixa emocional, hipótese diagnóstica (CID-F), evolução, atestado |
+| Nutricionista | CRN | Antropometria, recordatório alimentar, plano alimentar |
+| Fisioterapeuta | CREFITO | Avaliação postural/ADM/força, plano de exercícios |
+| Fonoaudiólogo | CRFa | Avaliação de fala/audição/linguagem, plano terapêutico |
+| Enfermeiro | COREN | Sinais vitais, evolução, procedimentos |
+| Terapeuta Ocupacional | CREFITO | Avaliação funcional/AVDs, plano de intervenção |
+| Educador Físico | CREF | Avaliação física, plano de treino |
 
-### Layout
+### Definição da categoria
 
-- Cabeçalho fixo com **Dashboard resumido**: nome, idade, foto/iniciais, alergias em destaque (badge vermelho), risco, próximo retorno.
-- Menu lateral interno com as 12 seções (ícones + labels), navegação por âncora/aba.
-- Cards organizados, responsivo desktop/tablet, tokens semânticos do design system (gold/sidebar já existentes).
+- Cada usuário escolhe sua **categoria profissional** + **número do conselho** no perfil.
+- O prontuário se adapta automaticamente ao logar (sem campo no paciente).
+- Admin pode atender qualquer paciente (vê tudo).
 
-### Seções implementadas
+### Mudanças por categoria
 
-1. **Identificação** — nome, nascimento, idade automática, sexo, CPF, telefone, e-mail, endereço, contato de emergência, **tipo de atendimento (médico/odontológico)**.
-2. **Anamnese** — queixa principal, HDA, histórico pregresso/familiar, alergias, medicações contínuas, hábitos (tabagismo, álcool, atividade), condições crônicas.
-3. **Exame Clínico** — sinais vitais (PA, FC, Temp, SpO₂, peso, altura, IMC auto) + observações. Se odontológico → **odontograma interativo SVG** (32 dentes, marcação de status: hígido, cárie, restaurado, ausente, tratamento).
-4. **Diagnóstico** — principal, secundários (lista), CID-10 com autocomplete (lista local dos mais comuns), grau de risco (baixo/médio/alto).
-5. **Projeto Terapêutico** — objetivos, plano, intervenções, profissionais envolvidos, frequência.
-6. **Tratamento** — procedimentos realizados, evolução em timeline (data + profissional + descrição).
-7. **Exames** — solicitação (lista), resultados anexados (PDF/imagem), interpretação.
-8. **Prescrições** — medicamento, dosagem, frequência, duração; **gerar receita em PDF (jsPDF)** com cabeçalho da clínica.
-9. **Evolução Clínica** — timeline cronológica de notas por atendimento.
-10. **Documentos e Anexos** — upload livre, organização por tipo/data.
-11. **Agenda e Retornos** — integra com `appointments` existente; mostra próximas consultas, histórico, alerta de retorno.
-12. **Segurança e Auditoria** — log de criação/edição (usuário, data, seção, ação) visível ao admin.
-
-### Funcionalidades inteligentes
-
-- Busca rápida dentro do prontuário (filtro por seção/conteúdo).
-- Autocomplete CID-10 e medicamentos comuns (lista local inicial).
-- Reuso de prescrições anteriores (botão "duplicar").
-- Alertas críticos no topo (alergias, alto risco).
-
-### Banco de dados (migration)
-
-Novas tabelas, todas com `owner_id uuid default auth.uid()`, RLS owner-or-admin (mesmo padrão das tabelas existentes):
-
-- `medical_records` (1 por paciente) — `patient_id`, `record_type` ('medical'|'dental'), identificação extra (CPF, endereço, sexo, nascimento, contato_emergência).
-- `anamnesis` — campos de anamnese (FK record).
-- `clinical_exams` — sinais vitais + observações + `dental_chart jsonb` (odontograma).
-- `diagnoses` — principal, secundários (jsonb), CID, risco.
-- `therapeutic_plans` — objetivos, plano, intervenções, profissionais, frequência.
-- `treatments` — entradas de timeline (procedimento, profissional, data, notas).
-- `exam_requests` — exame solicitado, resultado_url, interpretação.
-- `prescriptions` + `prescription_items` — receita com vários medicamentos.
-- `clinical_evolution` — timeline de notas.
-- `record_attachments` — arquivos genéricos (tipo, url, nome, data).
-- `audit_log` — `user_id`, `record_id`, `section`, `action`, `details jsonb`, `created_at`.
-
-Bucket de Storage **`medical-records`** (privado), políticas: owner pode ler/escrever em pasta `{user_id}/...`.
-
-Campos extras em `patients`: `birth_date`, `cpf`, `gender`, `address`, `emergency_contact` (nullable, retrocompatível).
-
-### Arquitetura de código
+**1. Seções visíveis (sidebar do prontuário):**
 
 ```text
-src/pages/
-  MedicalRecords.tsx          (lista de pacientes para abrir prontuário)
-  MedicalRecord.tsx           (página do prontuário, layout + roteamento de seções)
-src/components/medical-record/
-  RecordHeader.tsx            (dashboard resumido + alertas)
-  RecordSidebar.tsx           (menu interno das 12 seções)
-  sections/
-    Identification.tsx
-    Anamnesis.tsx
-    ClinicalExam.tsx          (renderiza Odontogram se dental)
-    Odontogram.tsx
-    Diagnosis.tsx
-    TherapeuticPlan.tsx
-    Treatment.tsx
-    Exams.tsx
-    Prescriptions.tsx         (com generatePrescriptionPDF)
-    Evolution.tsx
-    Attachments.tsx
-    AppointmentsHistory.tsx
-    AuditLog.tsx
-  hooks/
-    useMedicalRecord.ts       (carrega registro completo)
-    useAuditLog.ts            (registra ações)
-src/lib/
-  cid10.ts                    (lista local de códigos comuns)
-  medications.ts              (lista local de medicamentos comuns)
-  pdf.ts                      (jsPDF helper p/ receita)
+                       Méd Odo Psi Nut Fis Fon Enf TO  Edf
+Identificação           ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓
+Anamnese                ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓
+Exame Clínico           ✓   ✓   —   ✓   ✓   ✓   ✓   ✓   ✓
+Odontograma             —   ✓   —   —   —   —   —   —   —
+Diagnóstico (CID)       ✓   ✓   ✓   —   —   —   ✓   —   —
+Plano (terapêutico)     ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓
+Tratamento/Procedim.    ✓   ✓   —   —   ✓   ✓   ✓   ✓   ✓
+Exames laboratoriais    ✓   ✓   —   ✓   —   —   ✓   —   —
+Prescrições/Receita     ✓   ✓   —   —   —   —   —   —   —
+Plano alimentar         —   —   —   ✓   —   —   —   —   —
+Plano de exercícios     —   —   —   —   ✓   —   —   —   ✓
+Avaliação funcional     —   —   ✓   —   ✓   ✓   —   ✓   ✓
+Evolução                ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓
+Anexos                  ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓
+Agenda                  ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓
+Auditoria               ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✓
 ```
 
-Dependências novas: `jspdf` (PDF cliente).
+**2. Campos específicos:**
 
-### Segurança
+- **Exame Clínico**: psicólogo não tem; nutri ganha **antropometria** (circunferências cintura/quadril/braço, dobras, % gordura); fisio ganha **avaliação postural + ADM + força (escala 0-5)**; fono ganha campos de avaliação fonoaudiológica; T.O. ganha **AVDs (Katz/Lawton)**; ed. físico ganha **testes físicos** (PA esforço, VO₂, flexibilidade).
+- **Anamnese**: psico ganha "queixa emocional/história psíquica"; nutri ganha "hábitos alimentares + objetivo"; fisio ganha "queixa funcional + dor (EVA)".
 
-- Todas as tabelas com RLS `owner_id = auth.uid() OR has_role(admin)`.
-- Storage bucket privado, signed URLs para anexos.
-- Validação Zod em todos os formulários.
-- Audit log gravado em cada save (insert/update) automaticamente via hook.
+**3. Documentos próprios (PDF) — além da receita:**
+
+- Médico/Odonto: **Receita** (já existe) + **Atestado**.
+- Psicólogo: **Atestado psicológico**, **Relatório psicológico**.
+- Nutricionista: **Plano alimentar** (cabeçalho + refeições + orientações).
+- Fisioterapeuta: **Plano de tratamento fisioterápico** (objetivos + condutas + frequência).
+- Fonoaudiólogo: **Plano fonoaudiológico**.
+- Enfermeiro: **Relatório de enfermagem**.
+- T.O.: **Plano de intervenção ocupacional**.
+- Ed. físico: **Plano de treino**.
+
+Todos com cabeçalho da clínica, dados do paciente, conteúdo, e assinatura "Nome — CONSELHO/UF nº".
+
+### Implementação técnica
+
+**Banco de dados (1 migration):**
+
+- Em `profiles`: adicionar `professional_category text` e `professional_registry text` (CRP/CRN/etc).
+- Nova tabela `professional_assessments` (avaliações específicas por categoria) com campos jsonb flexíveis: `category text`, `data jsonb`, `record_id`, `owner_id`, RLS owner-or-admin.
+- Nova tabela `nutrition_plans` (`record_id`, `title`, `meals jsonb`, `guidelines text`, `valid_until`).
+- Nova tabela `exercise_plans` (`record_id`, `title`, `exercises jsonb`, `frequency text`, `duration_weeks`, `notes`).
+- Nova tabela `clinical_documents` (genérica para atestados/relatórios): `record_id`, `category text`, `doc_type text`, `title`, `content text`, `issued_at`, RLS owner-or-admin.
+
+**Frontend:**
+
+- `src/lib/professionalCategories.ts`: enum + metadata (label, conselho, cor, seções visíveis, helpers).
+- Hook `useProfessional()` lê `profiles.professional_category` + `professional_registry` do usuário logado (fallback para admin = "medical").
+- `RecordSidebar` recebe `category` e filtra `SECTIONS` dinamicamente.
+- `MedicalRecord.tsx` usa categoria do profissional logado em vez de `record.record_type` para decidir o que renderizar (mantém `record_type` para compatibilidade do odontograma).
+- Novas seções:
+  - `NutritionPlan.tsx` — refeições (café/lanche/almoço/jantar) + orientações + botão **gerar PDF plano alimentar**.
+  - `ExercisePlan.tsx` — lista de exercícios (nome, séries, repetições, carga, descanso) + frequência + **PDF**.
+  - `FunctionalAssessment.tsx` — formulário adaptado por categoria (psico/fisio/fono/TO/edf), salvo em `professional_assessments` com jsonb.
+  - `ClinicalDocuments.tsx` — atestados e relatórios por categoria, com **PDF**.
+- `Identification.tsx`: remover seletor médico/odonto e mostrar **categoria do profissional logado** (read-only badge), mantendo o toggle só para admins.
+- Novas funções em `src/lib/pdf.ts`:
+  - `generateNutritionPlanPdf`, `generateExercisePlanPdf`, `generateClinicalDocumentPdf`.
+  - Atualizar assinatura para usar `${categoria.conselho}/UF ${registro}` automaticamente.
+- Página `Profile`/área de configuração: campo **Categoria profissional** (select) + **Número do conselho** (input). Se ainda não existir, criar `src/pages/Profile.tsx` simples com link no header.
+
+**Compatibilidade:**
+
+- Prescrições continuam só para médico e odonto.
+- Odontograma continua dependendo de `record_type='dental'`.
+- Pacientes existentes continuam funcionando — categoria vem do profissional, não do paciente.
 
 ### Entrega
 
-- Migration única com todas as tabelas, bucket, RLS e políticas.
-- Após aprovação da migration: implemento UI + hooks + PDF.
-- Botão "Abrir prontuário" adicionado em `Patients.tsx`.
-- Item "Prontuários" adicionado em `AppLayout.tsx`.
+1. Migration (5 alterações de schema).
+2. Página de perfil para definir categoria + conselho.
+3. Lib de categorias + filtro dinâmico de seções.
+4. Novas seções (nutrition, exercise, assessment, documents).
+5. Novos PDFs.
+6. Ajustes em `Prescriptions`, `RecordSidebar`, `Identification`, `MedicalRecord`.
 
-Aprova o plano para eu seguir com a migration e implementação?
+Aprova o plano para eu implementar?

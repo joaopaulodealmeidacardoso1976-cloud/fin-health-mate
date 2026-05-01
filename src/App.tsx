@@ -17,6 +17,7 @@ import Reports from "./pages/Reports";
 import MedicalRecords from "./pages/MedicalRecords";
 import MedicalRecord from "./pages/MedicalRecord";
 import AccessRequests from "./pages/AccessRequests";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/prontuarios" element={<Protected><MedicalRecords /></Protected>} />
             <Route path="/prontuarios/:patientId" element={<Protected><MedicalRecord /></Protected>} />
             <Route path="/admin/solicitacoes" element={<Protected><AccessRequests /></Protected>} />
+            <Route path="/perfil" element={<Protected><Profile /></Protected>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

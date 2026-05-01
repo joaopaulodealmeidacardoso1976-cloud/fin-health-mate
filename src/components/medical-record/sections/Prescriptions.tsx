@@ -14,7 +14,9 @@ import { generatePrescriptionPdf } from "@/lib/pdf";
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }
 interface Prescription { id: string; professional: string | null; professional_registry: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
 
-export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; }) => {
+export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, recordType }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; recordType: "medical" | "dental"; }) => {
+  const registryLabel = recordType === "dental" ? "CRO" : "CRM";
+  const registryPlaceholder = recordType === "dental" ? "Ex: CRO/SP 12345" : "Ex: CRM/SP 123456";
   const [list, setList] = useState<Prescription[]>([]);
   const [open, setOpen] = useState(false);
   const [professional, setProfessional] = useState("");
@@ -83,7 +85,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
         <div className="mb-4 p-4 bg-muted/30 rounded-lg space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div><Label>Profissional</Label><Input value={professional} onChange={(e) => setProfessional(e.target.value)} /></div>
-            <div><Label>CRM / CRO</Label><Input value={professionalRegistry} onChange={(e) => setProfessionalRegistry(e.target.value)} placeholder="Ex: CRM/SP 123456" /></div>
+            <div><Label>{registryLabel}</Label><Input value={professionalRegistry} onChange={(e) => setProfessionalRegistry(e.target.value)} placeholder={registryPlaceholder} /></div>
           </div>
           {items.map((it, idx) => (
             <div key={idx} className="border border-border rounded-md p-3 space-y-2 relative">

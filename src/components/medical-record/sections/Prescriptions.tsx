@@ -127,7 +127,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf }: 
             <div key={p.id} className="border border-border rounded-lg p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">{new Date(p.prescribed_at).toLocaleString("pt-BR")} {p.professional && `• ${p.professional}`}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(p.prescribed_at).toLocaleString("pt-BR")} {p.professional && `• ${p.professional}`}{p.professional_registry && ` (${p.professional_registry})`}</p>
                   <ul className="mt-1 space-y-1">
                     {p.items.map((i, k) => (
                       <li key={k} className="text-sm"><span className="font-medium">{i.medication}</span> {i.dosage && `— ${i.dosage}`} {i.frequency && `• ${i.frequency}`} {i.duration && `• ${i.duration}`}</li>

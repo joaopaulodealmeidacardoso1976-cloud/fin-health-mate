@@ -81,7 +81,10 @@ export function generatePrescriptionPdf(input: PrescriptionPdfInput) {
 
   y = Math.max(y + 30, 250);
   doc.line(pageW / 2 - 40, y, pageW / 2 + 40, y);
-  doc.text(input.professional ?? "Assinatura do profissional", pageW / 2, y + 5, { align: "center" });
+  const signature = input.professional
+    ? `${input.professional}${input.professionalRegistry ? ` — ${input.professionalRegistry}` : ""}`
+    : "Assinatura do profissional";
+  doc.text(signature, pageW / 2, y + 5, { align: "center" });
 
   doc.save(`receita-${input.patientName.replace(/\s+/g, "-").toLowerCase()}.pdf`);
 }

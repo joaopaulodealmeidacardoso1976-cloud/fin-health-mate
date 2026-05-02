@@ -11,11 +11,12 @@ import { logAudit } from "@/hooks/useAuditLog";
 import { searchMedications } from "@/lib/medications";
 import { generatePrescriptionPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { calculateAge } from "@/lib/age";
 
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }
 interface Prescription { id: string; professional: string | null; professional_registry: string | null; notes: string | null; prescribed_at: string; items: Item[]; }
 
-export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, recordType }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; recordType: "medical" | "dental"; }) => {
+export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, patientBirthDate, recordType }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; patientBirthDate?: string | null; recordType: "medical" | "dental"; }) => {
   const { profile } = useProfessional();
   const registryLabel = profile?.meta.council ?? (recordType === "dental" ? "CRO" : "CRM");
   const registryPlaceholder = `Ex: ${registryLabel}${profile?.uf ? `/${profile.uf}` : "/SP"} 12345`;

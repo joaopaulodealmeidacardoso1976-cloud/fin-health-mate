@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { searchExams } from "@/lib/exams";
 import { generateExamRequestPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { calculateAge } from "@/lib/age";
 
 interface ExamRequest {
   id: string; exam_name: string; requested_at: string;
@@ -24,9 +25,10 @@ interface Props {
   patientId: string;
   patientName?: string;
   patientCpf?: string | null;
+  patientBirthDate?: string | null;
 }
 
-export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null }: Props) => {
+export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null, patientBirthDate = null }: Props) => {
   const { user } = useAuth();
   const { profile } = useProfessional();
   const [list, setList] = useState<ExamRequest[]>([]);
@@ -89,6 +91,7 @@ export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null
       clinicName: "DADOSTOP CLINIC",
       patientName: patientName || "Paciente",
       patientCpf,
+      patientAge: calculateAge(patientBirthDate),
       exams: exams.map((e) => ({ name: e.exam_name, notes: e.interpretation })),
       clinicalInfo: clinicalInfo || null,
       issuedAt: new Date(),

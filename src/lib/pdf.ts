@@ -4,6 +4,7 @@ export interface PrescriptionPdfInput {
   clinicName: string;
   patientName: string;
   patientCpf?: string | null;
+  patientAge?: number | null;
   professional?: string | null;
   professionalRegistry?: string | null;
   prescribedAt: Date;
@@ -32,6 +33,10 @@ export function generatePrescriptionPdf(input: PrescriptionPdfInput) {
   doc.setFontSize(11);
   doc.text(`Paciente: ${input.patientName}`, 15, y);
   y += 6;
+  if (input.patientAge != null) {
+    doc.text(`Idade: ${input.patientAge} anos`, 15, y);
+    y += 6;
+  }
   if (input.patientCpf) {
     doc.text(`CPF/Documento: ${input.patientCpf}`, 15, y);
     y += 6;
@@ -245,6 +250,7 @@ export interface ExamRequestPdfInput {
   clinicName: string;
   patientName: string;
   patientCpf?: string | null;
+  patientAge?: number | null;
   exams: { name: string; notes?: string | null }[];
   clinicalInfo?: string | null;
   issuedAt: Date;
@@ -257,6 +263,7 @@ export function generateExamRequestPdf(input: ExamRequestPdfInput) {
   let y = header(doc, input.clinicName, "Solicitação de Exames");
   doc.setFontSize(11);
   doc.text(`Paciente: ${input.patientName}`, 15, y); y += 6;
+  if (input.patientAge != null) { doc.text(`Idade: ${input.patientAge} anos`, 15, y); y += 6; }
   if (input.patientCpf) { doc.text(`CPF/Documento: ${input.patientCpf}`, 15, y); y += 6; }
   doc.text(`Data: ${input.issuedAt.toLocaleDateString("pt-BR")}`, 15, y); y += 10;
 

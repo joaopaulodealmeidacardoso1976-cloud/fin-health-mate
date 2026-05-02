@@ -17,9 +17,8 @@ interface Patient {
   address: string | null; emergency_contact: string | null;
 }
 
-export const Identification = ({ patient, record, onTypeChange, onPatientUpdate }: {
+export const Identification = ({ patient, record, onPatientUpdate }: {
   patient: Patient; record: MedicalRecord;
-  onTypeChange: (t: "medical" | "dental") => void;
   onPatientUpdate: () => void;
 }) => {
   const [form, setForm] = useState(patient);
@@ -47,16 +46,6 @@ export const Identification = ({ patient, record, onTypeChange, onPatientUpdate 
     <SectionCard title="Identificação do Paciente" icon={<User className="h-5 w-5" />}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div><Label>Nome completo</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-        <div>
-          <Label>Tipo de atendimento</Label>
-          <Select value={record.record_type} onValueChange={(v) => onTypeChange(v as "medical" | "dental")}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="medical">Médico</SelectItem>
-              <SelectItem value="dental">Odontológico</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
         <div><Label>Data de nascimento</Label><Input type="date" value={form.birth_date ?? ""} onChange={(e) => setForm({ ...form, birth_date: e.target.value || null })} /></div>
         <div><Label>Idade</Label><Input value={age !== null ? `${age} anos` : "—"} disabled /></div>
         <div>

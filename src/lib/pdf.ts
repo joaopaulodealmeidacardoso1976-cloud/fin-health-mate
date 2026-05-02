@@ -263,6 +263,7 @@ export function generateExamRequestPdf(input: ExamRequestPdfInput) {
   let y = header(doc, input.clinicName, "Solicitação de Exames");
   doc.setFontSize(11);
   doc.text(`Paciente: ${input.patientName}`, 15, y); y += 6;
+  if (input.patientAge != null) { doc.text(`Idade: ${input.patientAge} anos`, 15, y); y += 6; }
   if (input.patientCpf) { doc.text(`CPF/Documento: ${input.patientCpf}`, 15, y); y += 6; }
   doc.text(`Data: ${input.issuedAt.toLocaleDateString("pt-BR")}`, 15, y); y += 10;
 

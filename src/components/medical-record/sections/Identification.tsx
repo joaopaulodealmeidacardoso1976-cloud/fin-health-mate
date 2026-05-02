@@ -17,9 +17,8 @@ interface Patient {
   address: string | null; emergency_contact: string | null;
 }
 
-export const Identification = ({ patient, record, onTypeChange, onPatientUpdate }: {
+export const Identification = ({ patient, record, onPatientUpdate }: {
   patient: Patient; record: MedicalRecord;
-  onTypeChange: (t: "medical" | "dental") => void;
   onPatientUpdate: () => void;
 }) => {
   const [form, setForm] = useState(patient);

@@ -108,8 +108,8 @@ const MedicalRecord = () => {
           {active === "diagnosis" && <Diagnosis recordId={record.id} patientId={patient.id} />}
           {active === "plan" && <TherapeuticPlan recordId={record.id} patientId={patient.id} />}
           {active === "treatment" && <Treatment recordId={record.id} patientId={patient.id} />}
-          {active === "exams" && <Exams recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} />}
-          {active === "prescriptions" && <Prescriptions recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} recordType={isDental ? "dental" : "medical"} />}
+          {active === "exams" && <Exams recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} patientBirthDate={patient.birth_date} />}
+          {active === "prescriptions" && <Prescriptions recordId={record.id} patientId={patient.id} patientName={patient.name} patientCpf={patient.cpf} patientBirthDate={patient.birth_date} recordType={isDental ? "dental" : "medical"} />}
           {active === "nutrition_plan" && <NutritionPlan recordId={record.id} patientId={patient.id} patientName={patient.name} />}
           {active === "exercise_plan" && <ExercisePlan recordId={record.id} patientId={patient.id} patientName={patient.name} />}
           {active === "assessment" && <FunctionalAssessment recordId={record.id} patientId={patient.id} category={category} />}

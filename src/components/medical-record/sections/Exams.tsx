@@ -91,6 +91,7 @@ export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null
       clinicName: "DADOSTOP CLINIC",
       patientName: patientName || "Paciente",
       patientCpf,
+      patientAge: calculateAge(patientBirthDate),
       exams: exams.map((e) => ({ name: e.exam_name, notes: e.interpretation })),
       clinicalInfo: clinicalInfo || null,
       issuedAt: new Date(),

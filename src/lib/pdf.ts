@@ -4,6 +4,7 @@ export interface PrescriptionPdfInput {
   clinicName: string;
   patientName: string;
   patientCpf?: string | null;
+  patientAge?: number | null;
   professional?: string | null;
   professionalRegistry?: string | null;
   prescribedAt: Date;

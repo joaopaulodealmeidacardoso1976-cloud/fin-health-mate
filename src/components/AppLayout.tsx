@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useProfessional } from "@/hooks/useProfessional";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import AlertsBell from "@/components/AlertsBell";

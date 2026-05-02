@@ -250,6 +250,7 @@ export interface ExamRequestPdfInput {
   clinicName: string;
   patientName: string;
   patientCpf?: string | null;
+  patientAge?: number | null;
   exams: { name: string; notes?: string | null }[];
   clinicalInfo?: string | null;
   issuedAt: Date;

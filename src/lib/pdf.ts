@@ -239,3 +239,49 @@ export function generateClinicalDocumentPdf(input: ClinicalDocPdfInput) {
   signature(doc, input.professional, input.professionalRegistry, y);
   doc.save(`${input.docType.toLowerCase().replace(/\s+/g, "-")}-${input.patientName.replace(/\s+/g, "-").toLowerCase()}.pdf`);
 }
+
+// ----- Solicitação de exames -----
+export interface ExamRequestPdfInput {
+  clinicName: string;
+  patientName: string;
+  patientCpf?: string | null;
+  exams: { name: string; notes?: string | null }[];
+  clinicalInfo?: string | null;
+  issuedAt: Date;
+  professional?: string | null;
+  professionalRegistry?: string | null;
+}
+export function generateExamRequestPdf(input: ExamRequestPdfInput) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  let y = header(doc, input.clinicName, "Solicitação de Exames");
+  doc.setFontSize(11);
+  doc.text(`Paciente: ${input.patientName}`, 15, y); y += 6;
+  if (input.patientCpf) { doc.text(`CPF/Documento: ${input.patientCpf}`, 15, y); y += 6; }
+  doc.text(`Data: ${input.issuedAt.toLocaleDateString("pt-BR")}`, 15, y); y += 10;
+
+  doc.setFont("helvetica", "bold").text("Solicito os exames abaixo:", 15, y); y += 7;
+  doc.setFont("helvetica", "normal");
+  input.exams.forEach((e, i) => {
+    if (y > 250) { doc.addPage(); y = 20; }
+    doc.setFont("helvetica", "bold").text(`${i + 1}. ${e.name}`, 15, y); y += 6;
+    if (e.notes) {
+      doc.setFont("helvetica", "normal");
+      const lines = doc.splitTextToSize(e.notes, pageW - 30);
+      doc.text(lines, 20, y); y += lines.length * 5;
+    }
+    y += 2;
+  });
+
+  if (input.clinicalInfo) {
+    if (y > 240) { doc.addPage(); y = 20; }
+    y += 4;
+    doc.setFont("helvetica", "bold").text("Informações clínicas:", 15, y); y += 6;
+    doc.setFont("helvetica", "normal");
+    const lines = doc.splitTextToSize(input.clinicalInfo, pageW - 30);
+    doc.text(lines, 15, y); y += lines.length * 5;
+  }
+
+  signature(doc, input.professional, input.professionalRegistry, y);
+  doc.save(`solicitacao-exames-${input.patientName.replace(/\s+/g, "-").toLowerCase()}.pdf`);
+}

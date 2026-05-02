@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useProfessional } from "@/hooks/useProfessional";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import AlertsBell from "@/components/AlertsBell";
@@ -23,6 +24,7 @@ const baseNav = [
 const AppLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { profile } = useProfessional();
   const location = useLocation();
   const nav = isAdmin
     ? [...baseNav, { to: "/admin/solicitacoes", label: "Solicitações", icon: ShieldCheck }]
@@ -37,11 +39,30 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             <div className="h-10 w-10 rounded-full bg-gold-soft flex items-center justify-center">
               <Stethoscope className="h-5 w-5 text-gold-deep" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-display text-xl leading-none">DADOSTOP CLINIC</p>
               <p className="text-xs text-muted-foreground mt-1">Painel de gestão</p>
             </div>
           </div>
+          <NavLink
+            to="/perfil"
+            className={({ isActive }) =>
+              cn(
+                "mt-4 flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+                isActive
+                  ? "bg-gold-soft text-foreground font-medium"
+                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+              )
+            }
+          >
+            <UserCog className="h-4 w-4 shrink-0" />
+            <div className="flex flex-col min-w-0">
+              <span className="leading-tight">Meu perfil</span>
+              {profile?.meta?.label && (
+                <span className="text-xs text-gold-deep truncate">{profile.meta.label}</span>
+              )}
+            </div>
+          </NavLink>
         </div>
         <nav className="flex-1 px-3 py-6 space-y-1">
           {nav.map((item) => (
@@ -65,9 +86,6 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
         </nav>
         <div className="p-4 border-t border-sidebar-border space-y-2">
           <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-          <NavLink to="/perfil" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <UserCog className="h-4 w-4" />Meu perfil
-          </NavLink>
           <Button variant="ghost" size="sm" onClick={signOut} className="w-full justify-start">
             <LogOut className="h-4 w-4 mr-2" />Sair
           </Button>

@@ -102,7 +102,7 @@ const MedicalRecord = () => {
           <RecordSidebar active={active} onChange={setActive} category={category} />
         </aside>
         <main className="min-w-0">
-          {active === "identification" && <Identification patient={patient} record={record} onTypeChange={updateType} onPatientUpdate={loadPatient} />}
+          {active === "identification" && <Identification patient={patient} record={record} onPatientUpdate={loadPatient} />}
           {active === "anamnesis" && <Anamnesis recordId={record.id} patientId={patient.id} />}
           {active === "exam" && <ClinicalExam recordId={record.id} patientId={patient.id} isDental={isDental} />}
           {active === "diagnosis" && <Diagnosis recordId={record.id} patientId={patient.id} />}

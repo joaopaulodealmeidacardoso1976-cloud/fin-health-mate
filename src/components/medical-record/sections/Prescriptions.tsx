@@ -75,7 +75,7 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, pa
   const downloadPdf = (p: Prescription) => {
     generatePrescriptionPdf({
       clinicName: "DADOSTOP CLINIC",
-      patientName, patientCpf,
+      patientName, patientCpf, patientAge: calculateAge(patientBirthDate),
       professional: p.professional, professionalRegistry: p.professional_registry, prescribedAt: new Date(p.prescribed_at),
       items: p.items, notes: p.notes,
     });

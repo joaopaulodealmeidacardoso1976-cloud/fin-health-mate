@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 
 export interface PrescriptionPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   patientCpf?: string | null;
   patientAge?: number | null;

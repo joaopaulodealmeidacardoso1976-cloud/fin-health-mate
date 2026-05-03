@@ -29,6 +29,8 @@ const Auth = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     document.title = "Entrar | Clínica";

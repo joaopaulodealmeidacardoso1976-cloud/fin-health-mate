@@ -32,6 +32,7 @@ interface Props {
 export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null, patientBirthDate = null }: Props) => {
   const { user } = useAuth();
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const [list, setList] = useState<ExamRequest[]>([]);
   const [examName, setExamName] = useState("");
   const [showSugg, setShowSugg] = useState(false);

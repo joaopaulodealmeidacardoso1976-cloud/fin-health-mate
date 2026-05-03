@@ -9,6 +9,7 @@ import { useProfessional } from "@/hooks/useProfessional";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import AlertsBell from "@/components/AlertsBell";
+import { useClinic } from "@/hooks/useClinic";
 
 const baseNav = [
   { to: "/", label: "Visão geral", icon: LayoutDashboard, end: true },

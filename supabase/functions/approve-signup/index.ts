@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
     }
 
     const { request_id, action } = await req.json();
-    if (!request_id || !["approve", "reject"].includes(action)) {
+    if (!request_id || !["approve", "reject", "revoke"].includes(action)) {
       return new Response(JSON.stringify({ error: "invalid payload" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -71,6 +71,21 @@ Deno.serve(async (req) => {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    if (action === "revoke") {
+      // Cancel/disable the user account: delete auth user and mark request rejected
+      const target = await findUserByEmail(admin, reqRow.email);
+      if (target) {
+        await admin.auth.admin.deleteUser(target.id);
+      }
+      await admin.from("signup_requests").update({
+        status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: user.id,
+      }).eq("id", request_id);
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (reqRow.status !== "pending") {
       return new Response(JSON.stringify({ error: "already reviewed" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },

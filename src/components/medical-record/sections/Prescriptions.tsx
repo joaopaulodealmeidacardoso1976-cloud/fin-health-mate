@@ -11,6 +11,7 @@ import { logAudit } from "@/hooks/useAuditLog";
 import { searchMedications } from "@/lib/medications";
 import { generatePrescriptionPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 import { calculateAge } from "@/lib/age";
 
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }

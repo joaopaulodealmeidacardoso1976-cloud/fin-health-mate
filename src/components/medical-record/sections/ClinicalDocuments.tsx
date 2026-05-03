@@ -12,6 +12,7 @@ import { logAudit } from "@/hooks/useAuditLog";
 import { generateClinicalDocumentPdf } from "@/lib/pdf";
 import { ProfessionalCategory, getCategory } from "@/lib/professionalCategories";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 
 interface Doc { id: string; doc_type: string; title: string; content: string; issued_at: string; }
 

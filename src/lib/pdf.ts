@@ -84,18 +84,27 @@ export function generatePrescriptionPdf(input: PrescriptionPdfInput) {
 
 // ----- Helpers compartilhados -----
 
-function header(doc: jsPDF, clinicName: string, subtitle: string) {
+export function drawClinicHeader(doc: jsPDF, clinicName: string, logoDataUrl: string | null, subtitle: string) {
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 20;
+  let y = 15;
+  if (logoDataUrl) {
+    try {
+      const fmt = logoDataUrl.includes("image/png") ? "PNG" : (logoDataUrl.includes("image/webp") ? "WEBP" : "JPEG");
+      doc.addImage(logoDataUrl, fmt, 15, y, 20, 20);
+    } catch {}
+  }
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(clinicName, pageW / 2, y, { align: "center" });
-  y += 7;
+  doc.text(clinicName, pageW / 2, y + 8, { align: "center" });
   doc.setFont("helvetica", "normal").setFontSize(11);
-  doc.text(subtitle, pageW / 2, y, { align: "center" });
-  y += 10;
+  doc.text(subtitle, pageW / 2, y + 15, { align: "center" });
+  y += 22;
   doc.setLineWidth(0.3);
   doc.line(15, y, pageW - 15, y);
   return y + 8;
+}
+
+function header(doc: jsPDF, clinicName: string, subtitle: string, logoDataUrl: string | null = null) {
+  return drawClinicHeader(doc, clinicName, logoDataUrl, subtitle);
 }
 
 function signature(doc: jsPDF, professional: string | null | undefined, registry: string | null | undefined, fromY: number) {

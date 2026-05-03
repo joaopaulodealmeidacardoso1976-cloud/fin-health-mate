@@ -16,20 +16,7 @@ export interface PrescriptionPdfInput {
 export function generatePrescriptionPdf(input: PrescriptionPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 20;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(input.clinicName, pageW / 2, y, { align: "center" });
-  y += 7;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text("Receituário", pageW / 2, y, { align: "center" });
-  y += 10;
-
-  doc.setLineWidth(0.3);
-  doc.line(15, y, pageW - 15, y);
-  y += 8;
+  let y = drawClinicHeader(doc, input.clinicName, input.clinicLogoDataUrl ?? null, "Receituário");
 
   doc.setFontSize(11);
   doc.text(`Paciente: ${input.patientName}`, 15, y);

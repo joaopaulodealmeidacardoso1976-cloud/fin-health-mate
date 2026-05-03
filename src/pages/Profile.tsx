@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORY_OPTIONS, getCategory, ProfessionalCategory } from "@/lib/professionalCategories";
 import { toast } from "sonner";
-import { UserCog } from "lucide-react";
+import { UserCog, Upload, Image as ImageIcon } from "lucide-react";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -16,17 +16,20 @@ const Profile = () => {
   const [category, setCategory] = useState<ProfessionalCategory>("medical");
   const [registry, setRegistry] = useState("");
   const [uf, setUf] = useState("");
+  const [clinicName, setClinicName] = useState("");
+  const [clinicLogoUrl, setClinicLogoUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { document.title = "Meu Perfil | DADOSTOP CLINIC"; }, []);
+  useEffect(() => { document.title = "Meu Perfil | Painel Clínico"; }, []);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, professional_category, professional_registry, professional_uf")
+        .select("full_name, professional_category, professional_registry, professional_uf, clinic_name, clinic_logo_url")
         .eq("id", user.id)
         .maybeSingle();
       if (data) {
@@ -34,10 +37,25 @@ const Profile = () => {
         setCategory(((data as any).professional_category as ProfessionalCategory) || "medical");
         setRegistry((data as any).professional_registry ?? "");
         setUf((data as any).professional_uf ?? "");
+        setClinicName((data as any).clinic_name ?? "");
+        setClinicLogoUrl((data as any).clinic_logo_url ?? null);
       }
       setLoading(false);
     })();
   }, [user]);
+
+  const uploadLogo = async (file: File) => {
+    if (!user) return;
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/logo-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("clinic-logos").upload(path, file, { upsert: true });
+    setUploading(false);
+    if (error) { toast.error(error.message); return; }
+    const { data } = supabase.storage.from("clinic-logos").getPublicUrl(path);
+    setClinicLogoUrl(data.publicUrl);
+    toast.success("Logo carregada — clique em Salvar para confirmar");
+  };
 
   const save = async () => {
     if (!user) return;
@@ -47,6 +65,8 @@ const Profile = () => {
       professional_category: category,
       professional_registry: registry || null,
       professional_uf: uf || null,
+      clinic_name: clinicName || null,
+      clinic_logo_url: clinicLogoUrl,
     } as any).eq("id", user.id);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
@@ -58,7 +78,35 @@ const Profile = () => {
   const meta = getCategory(category);
 
   return (
-    <div className="max-w-2xl mx-auto w-full">
+    <div className="max-w-2xl mx-auto w-full space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><ImageIcon className="h-5 w-5" />Identidade da Clínica</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label>Nome da clínica</Label>
+            <Input value={clinicName} onChange={(e) => setClinicName(e.target.value)} placeholder="Ex: Clínica Bem Estar" />
+            <p className="text-xs text-muted-foreground mt-1">Aparece no painel e em todos os documentos impressos.</p>
+          </div>
+          <div>
+            <Label>Logo da clínica</Label>
+            <div className="flex items-center gap-4 mt-1">
+              <div className="h-20 w-20 rounded-md border border-border bg-muted/30 flex items-center justify-center overflow-hidden">
+                {clinicLogoUrl ? <img src={clinicLogoUrl} alt="logo" className="h-full w-full object-cover" /> : <ImageIcon className="h-6 w-6 text-muted-foreground" />}
+              </div>
+              <Label className="cursor-pointer inline-flex items-center text-sm border border-input bg-background hover:bg-accent rounded-md px-3 py-2">
+                <Upload className="h-4 w-4 mr-1" />{uploading ? "Enviando..." : "Enviar logo"}
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files && uploadLogo(e.target.files[0])} />
+              </Label>
+              {clinicLogoUrl && (
+                <Button variant="ghost" size="sm" onClick={() => setClinicLogoUrl(null)}>Remover</Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><UserCog className="h-5 w-5" />Meu Perfil Profissional</CardTitle>
@@ -81,7 +129,7 @@ const Profile = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="md:col-span-2">
               <Label>{meta.council} (número do conselho)</Label>
-              <Input value={registry} onChange={(e) => setRegistry(e.target.value)} placeholder={`Ex: 123456`} />
+              <Input value={registry} onChange={(e) => setRegistry(e.target.value)} placeholder="Ex: 123456" />
             </div>
             <div>
               <Label>UF</Label>

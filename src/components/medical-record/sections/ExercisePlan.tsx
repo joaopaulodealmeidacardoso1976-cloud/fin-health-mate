@@ -10,12 +10,14 @@ import { toast } from "sonner";
 import { logAudit } from "@/hooks/useAuditLog";
 import { generateExercisePlanPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 
 interface Exercise { name: string; sets: string; reps: string; load: string; rest: string; notes: string; }
 interface Plan { id: string; title: string; exercises: Exercise[]; frequency: string | null; duration_weeks: number | null; notes: string | null; created_at: string; }
 
 export const ExercisePlan = ({ recordId, patientId, patientName }: { recordId: string; patientId: string; patientName: string }) => {
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const [list, setList] = useState<Plan[]>([]);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("Plano de exercícios");
@@ -52,9 +54,11 @@ export const ExercisePlan = ({ recordId, patientId, patientName }: { recordId: s
     load();
   };
 
-  const downloadPdf = (p: Plan) => {
+  const downloadPdf = async (p: Plan) => {
+    const logo = await loadImageAsDataUrl(clinic.logoUrl);
     generateExercisePlanPdf({
-      clinicName: "DADOSTOP CLINIC",
+      clinicName: clinic.name,
+      clinicLogoDataUrl: logo,
       patientName, title: p.title, exercises: p.exercises, frequency: p.frequency, durationWeeks: p.duration_weeks, notes: p.notes,
       issuedAt: new Date(p.created_at),
       professional: profile?.fullName ?? null,

@@ -10,12 +10,14 @@ import { toast } from "sonner";
 import { logAudit } from "@/hooks/useAuditLog";
 import { generateNutritionPlanPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 
 interface Meal { name: string; time: string; items: string; }
 interface Plan { id: string; title: string; meals: Meal[]; guidelines: string | null; valid_until: string | null; created_at: string; }
 
 export const NutritionPlan = ({ recordId, patientId, patientName }: { recordId: string; patientId: string; patientName: string }) => {
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const [list, setList] = useState<Plan[]>([]);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("Plano alimentar");
@@ -55,9 +57,11 @@ export const NutritionPlan = ({ recordId, patientId, patientName }: { recordId: 
     load();
   };
 
-  const downloadPdf = (p: Plan) => {
+  const downloadPdf = async (p: Plan) => {
+    const logo = await loadImageAsDataUrl(clinic.logoUrl);
     generateNutritionPlanPdf({
-      clinicName: "DADOSTOP CLINIC",
+      clinicName: clinic.name,
+      clinicLogoDataUrl: logo,
       patientName, title: p.title, meals: p.meals, guidelines: p.guidelines, validUntil: p.valid_until,
       issuedAt: new Date(p.created_at),
       professional: profile?.fullName ?? null,

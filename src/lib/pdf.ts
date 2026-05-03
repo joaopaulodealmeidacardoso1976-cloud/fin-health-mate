@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 
 export interface PrescriptionPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   patientCpf?: string | null;
   patientAge?: number | null;
@@ -15,20 +16,7 @@ export interface PrescriptionPdfInput {
 export function generatePrescriptionPdf(input: PrescriptionPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 20;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(input.clinicName, pageW / 2, y, { align: "center" });
-  y += 7;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text("Receituário", pageW / 2, y, { align: "center" });
-  y += 10;
-
-  doc.setLineWidth(0.3);
-  doc.line(15, y, pageW - 15, y);
-  y += 8;
+  let y = drawClinicHeader(doc, input.clinicName, input.clinicLogoDataUrl ?? null, "Receituário");
 
   doc.setFontSize(11);
   doc.text(`Paciente: ${input.patientName}`, 15, y);
@@ -96,18 +84,27 @@ export function generatePrescriptionPdf(input: PrescriptionPdfInput) {
 
 // ----- Helpers compartilhados -----
 
-function header(doc: jsPDF, clinicName: string, subtitle: string) {
+export function drawClinicHeader(doc: jsPDF, clinicName: string, logoDataUrl: string | null, subtitle: string) {
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 20;
+  let y = 15;
+  if (logoDataUrl) {
+    try {
+      const fmt = logoDataUrl.includes("image/png") ? "PNG" : (logoDataUrl.includes("image/webp") ? "WEBP" : "JPEG");
+      doc.addImage(logoDataUrl, fmt, 15, y, 20, 20);
+    } catch {}
+  }
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(clinicName, pageW / 2, y, { align: "center" });
-  y += 7;
+  doc.text(clinicName, pageW / 2, y + 8, { align: "center" });
   doc.setFont("helvetica", "normal").setFontSize(11);
-  doc.text(subtitle, pageW / 2, y, { align: "center" });
-  y += 10;
+  doc.text(subtitle, pageW / 2, y + 15, { align: "center" });
+  y += 22;
   doc.setLineWidth(0.3);
   doc.line(15, y, pageW - 15, y);
   return y + 8;
+}
+
+function header(doc: jsPDF, clinicName: string, subtitle: string, logoDataUrl: string | null = null) {
+  return drawClinicHeader(doc, clinicName, logoDataUrl, subtitle);
 }
 
 function signature(doc: jsPDF, professional: string | null | undefined, registry: string | null | undefined, fromY: number) {
@@ -128,6 +125,7 @@ function patientBlock(doc: jsPDF, name: string, issuedAt: Date, fromY: number) {
 // ----- Plano alimentar -----
 export interface NutritionPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   title: string;
   meals: { name: string; time?: string; items?: string }[];
@@ -140,7 +138,7 @@ export interface NutritionPdfInput {
 export function generateNutritionPlanPdf(input: NutritionPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, input.title);
+  let y = header(doc, input.clinicName, input.title, input.clinicLogoDataUrl ?? null);
   y = patientBlock(doc, input.patientName, input.issuedAt, y);
   if (input.validUntil) { doc.text(`Válido até: ${new Date(input.validUntil).toLocaleDateString("pt-BR")}`, 15, y); y += 8; }
 
@@ -171,6 +169,7 @@ export function generateNutritionPlanPdf(input: NutritionPdfInput) {
 // ----- Plano de exercícios -----
 export interface ExercisePdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   title: string;
   exercises: { name: string; sets?: string; reps?: string; load?: string; rest?: string; notes?: string }[];
@@ -184,7 +183,7 @@ export interface ExercisePdfInput {
 export function generateExercisePlanPdf(input: ExercisePdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, input.title);
+  let y = header(doc, input.clinicName, input.title, input.clinicLogoDataUrl ?? null);
   y = patientBlock(doc, input.patientName, input.issuedAt, y);
   const meta: string[] = [];
   if (input.frequency) meta.push(`Frequência: ${input.frequency}`);
@@ -219,6 +218,7 @@ export function generateExercisePlanPdf(input: ExercisePdfInput) {
 // ----- Documento clínico genérico (atestados, relatórios) -----
 export interface ClinicalDocPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   title: string;
   docType: string;
@@ -230,7 +230,7 @@ export interface ClinicalDocPdfInput {
 export function generateClinicalDocumentPdf(input: ClinicalDocPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, input.docType);
+  let y = header(doc, input.clinicName, input.docType, input.clinicLogoDataUrl ?? null);
   y = patientBlock(doc, input.patientName, input.issuedAt, y);
   doc.setFont("helvetica", "bold").setFontSize(13).text(input.title, pageW / 2, y, { align: "center" });
   y += 10;
@@ -248,6 +248,7 @@ export function generateClinicalDocumentPdf(input: ClinicalDocPdfInput) {
 // ----- Solicitação de exames -----
 export interface ExamRequestPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   patientCpf?: string | null;
   patientAge?: number | null;
@@ -260,7 +261,7 @@ export interface ExamRequestPdfInput {
 export function generateExamRequestPdf(input: ExamRequestPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, "Solicitação de Exames");
+  let y = header(doc, input.clinicName, "Solicitação de Exames", input.clinicLogoDataUrl ?? null);
   doc.setFontSize(11);
   doc.text(`Paciente: ${input.patientName}`, 15, y); y += 6;
   if (input.patientAge != null) { doc.text(`Idade: ${input.patientAge} anos`, 15, y); y += 6; }

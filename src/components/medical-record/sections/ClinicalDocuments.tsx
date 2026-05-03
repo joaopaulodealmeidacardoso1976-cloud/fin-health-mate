@@ -12,11 +12,13 @@ import { logAudit } from "@/hooks/useAuditLog";
 import { generateClinicalDocumentPdf } from "@/lib/pdf";
 import { ProfessionalCategory, getCategory } from "@/lib/professionalCategories";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 
 interface Doc { id: string; doc_type: string; title: string; content: string; issued_at: string; }
 
 export const ClinicalDocuments = ({ recordId, patientId, patientName, category }: { recordId: string; patientId: string; patientName: string; category: ProfessionalCategory }) => {
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const meta = getCategory(category);
   const [list, setList] = useState<Doc[]>([]);
   const [open, setOpen] = useState(false);
@@ -47,9 +49,11 @@ export const ClinicalDocuments = ({ recordId, patientId, patientName, category }
     load();
   };
 
-  const downloadPdf = (d: Doc) => {
+  const downloadPdf = async (d: Doc) => {
+    const logo = await loadImageAsDataUrl(clinic.logoUrl);
     generateClinicalDocumentPdf({
-      clinicName: "DADOSTOP CLINIC",
+      clinicName: clinic.name,
+      clinicLogoDataUrl: logo,
       patientName, title: d.title, content: d.content, docType: meta.documentTypes.find(t => t.value === d.doc_type)?.label ?? d.doc_type,
       issuedAt: new Date(d.issued_at),
       professional: profile?.fullName ?? null,

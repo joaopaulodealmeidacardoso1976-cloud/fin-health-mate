@@ -9,6 +9,7 @@ import { useProfessional } from "@/hooks/useProfessional";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import AlertsBell from "@/components/AlertsBell";
+import { useClinic } from "@/hooks/useClinic";
 
 const baseNav = [
   { to: "/", label: "Visão geral", icon: LayoutDashboard, end: true },
@@ -25,6 +26,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const location = useLocation();
   const nav = isAdmin
     ? [...baseNav, { to: "/admin/solicitacoes", label: "Solicitações", icon: ShieldCheck }]
@@ -36,11 +38,15 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
       <aside className="hidden md:flex w-64 flex-col bg-sidebar border-r border-sidebar-border">
         <div className="px-6 py-6 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gold-soft flex items-center justify-center">
-              <Stethoscope className="h-5 w-5 text-gold-deep" />
+            <div className="h-10 w-10 rounded-full bg-gold-soft flex items-center justify-center overflow-hidden">
+              {clinic.logoUrl ? (
+                <img src={clinic.logoUrl} alt={`${clinic.name} logo`} className="h-full w-full object-cover" />
+              ) : (
+                <Stethoscope className="h-5 w-5 text-gold-deep" />
+              )}
             </div>
             <div className="min-w-0">
-              <p className="font-display text-xl leading-none">DADOSTOP CLINIC</p>
+              <p className="font-display text-xl leading-none truncate">{clinic.name}</p>
               <p className="text-xs text-muted-foreground mt-1">Painel de gestão</p>
             </div>
           </div>

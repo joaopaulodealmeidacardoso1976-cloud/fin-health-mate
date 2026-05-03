@@ -22,12 +22,15 @@ const requestSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
   reason: z.string().trim().max(500).optional(),
+  clinic_name: z.string().trim().max(120).optional(),
 });
 
 const Auth = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     document.title = "Entrar | Clínica";
@@ -61,19 +64,34 @@ const Auth = () => {
       email: fd.get("email"),
       password: fd.get("password"),
       reason: fd.get("reason") || undefined,
+      clinic_name: fd.get("clinic_name") || undefined,
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     setSubmitting(true);
     try {
+      let logoUrl: string | null = null;
+      if (logoFile) {
+        setUploadingLogo(true);
+        const ext = logoFile.name.split(".").pop();
+        const path = `signup/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("clinic-logos").upload(path, logoFile);
+        setUploadingLogo(false);
+        if (upErr) throw upErr;
+        const { data: pub } = supabase.storage.from("clinic-logos").getPublicUrl(path);
+        logoUrl = pub.publicUrl;
+      }
       const { error } = await supabase.from("signup_requests").insert({
         full_name: parsed.data.full_name,
         email: parsed.data.email,
         password_hash: parsed.data.password,
         reason: parsed.data.reason ?? null,
-      });
+        clinic_name: parsed.data.clinic_name ?? null,
+        clinic_logo_url: logoUrl,
+      } as any);
       if (error) throw error;
       toast.success("Solicitação enviada! Aguarde a autorização do administrador.");
       (e.target as HTMLFormElement).reset();
+      setLogoFile(null);
     } catch (err: any) {
       toast.error(err.message || "Erro ao enviar solicitação");
     } finally {
@@ -114,8 +132,14 @@ const Auth = () => {
                 <div><Label htmlFor="full_name">Nome completo</Label><Input id="full_name" name="full_name" required /></div>
                 <div><Label htmlFor="email_r">E-mail</Label><Input id="email_r" name="email" type="email" required /></div>
                 <div><Label htmlFor="password_r">Senha desejada</Label><Input id="password_r" name="password" type="password" required minLength={6} /></div>
-                <div><Label htmlFor="reason">Motivo (opcional)</Label><Textarea id="reason" name="reason" rows={3} /></div>
-                <Button type="submit" disabled={submitting} className="w-full bg-gold text-primary hover:bg-gold/90">
+                <div><Label htmlFor="clinic_name">Nome da clínica (opcional)</Label><Input id="clinic_name" name="clinic_name" placeholder="Ex: Clínica Bem Estar" /></div>
+                <div>
+                  <Label htmlFor="logo">Logo da clínica (opcional)</Label>
+                  <Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />
+                  <p className="text-[11px] text-muted-foreground mt-1">Você pode adicionar ou alterar depois em "Meu perfil".</p>
+                </div>
+                <div><Label htmlFor="reason">Motivo (opcional)</Label><Textarea id="reason" name="reason" rows={2} /></div>
+                <Button type="submit" disabled={submitting || uploadingLogo} className="w-full bg-gold text-primary hover:bg-gold/90">
                   {submitting ? "Enviando..." : "Solicitar acesso"}
                 </Button>
               </form>

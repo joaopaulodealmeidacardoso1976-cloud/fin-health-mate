@@ -814,6 +814,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          clinic_logo_url: string | null
+          clinic_name: string | null
           created_at: string
           email: string | null
           full_name: string | null
@@ -825,6 +827,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          clinic_logo_url?: string | null
+          clinic_name?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -836,6 +840,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          clinic_logo_url?: string | null
+          clinic_name?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -891,6 +897,8 @@ export type Database = {
       }
       signup_requests: {
         Row: {
+          clinic_logo_url: string | null
+          clinic_name: string | null
           created_at: string
           email: string
           full_name: string
@@ -902,6 +910,8 @@ export type Database = {
           status: Database["public"]["Enums"]["signup_status"]
         }
         Insert: {
+          clinic_logo_url?: string | null
+          clinic_name?: string | null
           created_at?: string
           email: string
           full_name: string
@@ -913,6 +923,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["signup_status"]
         }
         Update: {
+          clinic_logo_url?: string | null
+          clinic_name?: string | null
           created_at?: string
           email?: string
           full_name?: string

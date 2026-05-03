@@ -11,6 +11,7 @@ import { logAudit } from "@/hooks/useAuditLog";
 import { searchMedications } from "@/lib/medications";
 import { generatePrescriptionPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 import { calculateAge } from "@/lib/age";
 
 interface Item { medication: string; dosage: string; frequency: string; duration: string; instructions: string; }
@@ -18,6 +19,7 @@ interface Prescription { id: string; professional: string | null; professional_r
 
 export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, patientBirthDate, recordType }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; patientBirthDate?: string | null; recordType: "medical" | "dental"; }) => {
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const registryLabel = profile?.meta.council ?? (recordType === "dental" ? "CRO" : "CRM");
   const registryPlaceholder = `Ex: ${registryLabel}${profile?.uf ? `/${profile.uf}` : "/SP"} 12345`;
   const [list, setList] = useState<Prescription[]>([]);
@@ -72,9 +74,11 @@ export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, pa
     load();
   };
 
-  const downloadPdf = (p: Prescription) => {
+  const downloadPdf = async (p: Prescription) => {
+    const logo = await loadImageAsDataUrl(clinic.logoUrl);
     generatePrescriptionPdf({
-      clinicName: "DADOSTOP CLINIC",
+      clinicName: clinic.name,
+      clinicLogoDataUrl: logo,
       patientName, patientCpf, patientAge: calculateAge(patientBirthDate),
       professional: p.professional, professionalRegistry: p.professional_registry, prescribedAt: new Date(p.prescribed_at),
       items: p.items, notes: p.notes,

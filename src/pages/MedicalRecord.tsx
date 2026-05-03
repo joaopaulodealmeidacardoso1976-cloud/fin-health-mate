@@ -43,7 +43,7 @@ const MedicalRecord = () => {
   const [risk, setRisk] = useState<"low" | "medium" | "high" | null>(null);
   const [nextAppt, setNextAppt] = useState<string | null>(null);
 
-  useEffect(() => { document.title = "Prontuário | DADOSTOP CLINIC"; }, []);
+  useEffect(() => { document.title = "Prontuário | Painel Clínico"; }, []);
 
   const loadPatient = async () => {
     if (!patientId) return;

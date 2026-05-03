@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { searchExams } from "@/lib/exams";
 import { generateExamRequestPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 import { calculateAge } from "@/lib/age";
 
 interface ExamRequest {
@@ -31,6 +32,7 @@ interface Props {
 export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null, patientBirthDate = null }: Props) => {
   const { user } = useAuth();
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const [list, setList] = useState<ExamRequest[]>([]);
   const [examName, setExamName] = useState("");
   const [showSugg, setShowSugg] = useState(false);
@@ -82,13 +84,15 @@ export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null
     load();
   };
 
-  const printRequest = (exams: ExamRequest[]) => {
+  const printRequest = async (exams: ExamRequest[]) => {
     if (!exams.length) { toast.error("Selecione ao menos um exame"); return; }
     const registry = profile?.registry
       ? `${profile.meta.council}${profile.uf ? `/${profile.uf}` : ""} ${profile.registry}`
       : null;
+    const logo = await loadImageAsDataUrl(clinic.logoUrl);
     generateExamRequestPdf({
-      clinicName: "DADOSTOP CLINIC",
+      clinicName: clinic.name,
+      clinicLogoDataUrl: logo,
       patientName: patientName || "Paciente",
       patientCpf,
       patientAge: calculateAge(patientBirthDate),

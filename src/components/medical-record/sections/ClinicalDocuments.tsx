@@ -49,9 +49,11 @@ export const ClinicalDocuments = ({ recordId, patientId, patientName, category }
     load();
   };
 
-  const downloadPdf = (d: Doc) => {
+  const downloadPdf = async (d: Doc) => {
+    const logo = await loadImageAsDataUrl(clinic.logoUrl);
     generateClinicalDocumentPdf({
-      clinicName: "DADOSTOP CLINIC",
+      clinicName: clinic.name,
+      clinicLogoDataUrl: logo,
       patientName, title: d.title, content: d.content, docType: meta.documentTypes.find(t => t.value === d.doc_type)?.label ?? d.doc_type,
       issuedAt: new Date(d.issued_at),
       professional: profile?.fullName ?? null,

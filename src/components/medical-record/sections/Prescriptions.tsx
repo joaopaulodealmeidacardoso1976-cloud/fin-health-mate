@@ -19,6 +19,7 @@ interface Prescription { id: string; professional: string | null; professional_r
 
 export const Prescriptions = ({ recordId, patientId, patientName, patientCpf, patientBirthDate, recordType }: { recordId: string; patientId: string; patientName: string; patientCpf: string | null; patientBirthDate?: string | null; recordType: "medical" | "dental"; }) => {
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const registryLabel = profile?.meta.council ?? (recordType === "dental" ? "CRO" : "CRM");
   const registryPlaceholder = `Ex: ${registryLabel}${profile?.uf ? `/${profile.uf}` : "/SP"} 12345`;
   const [list, setList] = useState<Prescription[]>([]);

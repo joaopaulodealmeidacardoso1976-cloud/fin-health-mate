@@ -84,13 +84,15 @@ export const Exams = ({ recordId, patientId, patientName = "", patientCpf = null
     load();
   };
 
-  const printRequest = (exams: ExamRequest[]) => {
+  const printRequest = async (exams: ExamRequest[]) => {
     if (!exams.length) { toast.error("Selecione ao menos um exame"); return; }
     const registry = profile?.registry
       ? `${profile.meta.council}${profile.uf ? `/${profile.uf}` : ""} ${profile.registry}`
       : null;
+    const logo = await loadImageAsDataUrl(clinic.logoUrl);
     generateExamRequestPdf({
-      clinicName: "DADOSTOP CLINIC",
+      clinicName: clinic.name,
+      clinicLogoDataUrl: logo,
       patientName: patientName || "Paciente",
       patientCpf,
       patientAge: calculateAge(patientBirthDate),

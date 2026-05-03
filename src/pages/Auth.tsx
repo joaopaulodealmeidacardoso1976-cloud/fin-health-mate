@@ -64,19 +64,34 @@ const Auth = () => {
       email: fd.get("email"),
       password: fd.get("password"),
       reason: fd.get("reason") || undefined,
+      clinic_name: fd.get("clinic_name") || undefined,
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     setSubmitting(true);
     try {
+      let logoUrl: string | null = null;
+      if (logoFile) {
+        setUploadingLogo(true);
+        const ext = logoFile.name.split(".").pop();
+        const path = `signup/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("clinic-logos").upload(path, logoFile);
+        setUploadingLogo(false);
+        if (upErr) throw upErr;
+        const { data: pub } = supabase.storage.from("clinic-logos").getPublicUrl(path);
+        logoUrl = pub.publicUrl;
+      }
       const { error } = await supabase.from("signup_requests").insert({
         full_name: parsed.data.full_name,
         email: parsed.data.email,
         password_hash: parsed.data.password,
         reason: parsed.data.reason ?? null,
-      });
+        clinic_name: parsed.data.clinic_name ?? null,
+        clinic_logo_url: logoUrl,
+      } as any);
       if (error) throw error;
       toast.success("Solicitação enviada! Aguarde a autorização do administrador.");
       (e.target as HTMLFormElement).reset();
+      setLogoFile(null);
     } catch (err: any) {
       toast.error(err.message || "Erro ao enviar solicitação");
     } finally {

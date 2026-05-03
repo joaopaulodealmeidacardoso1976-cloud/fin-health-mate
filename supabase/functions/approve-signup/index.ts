@@ -153,6 +153,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Apply clinic identity from the request to the user's profile
+    if (reqRow.clinic_name || reqRow.clinic_logo_url) {
+      await admin.from("profiles").update({
+        clinic_name: reqRow.clinic_name ?? null,
+        clinic_logo_url: reqRow.clinic_logo_url ?? null,
+      }).eq("id", approvedUser.id);
+    }
+
     await admin.from("signup_requests").update({
       status: "approved",
       reviewed_at: new Date().toISOString(),

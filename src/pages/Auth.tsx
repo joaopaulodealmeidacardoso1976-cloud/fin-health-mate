@@ -22,6 +22,7 @@ const requestSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
   reason: z.string().trim().max(500).optional(),
+  clinic_name: z.string().trim().max(120).optional(),
 });
 
 const Auth = () => {

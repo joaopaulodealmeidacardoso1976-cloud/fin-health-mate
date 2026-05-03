@@ -132,8 +132,14 @@ const Auth = () => {
                 <div><Label htmlFor="full_name">Nome completo</Label><Input id="full_name" name="full_name" required /></div>
                 <div><Label htmlFor="email_r">E-mail</Label><Input id="email_r" name="email" type="email" required /></div>
                 <div><Label htmlFor="password_r">Senha desejada</Label><Input id="password_r" name="password" type="password" required minLength={6} /></div>
-                <div><Label htmlFor="reason">Motivo (opcional)</Label><Textarea id="reason" name="reason" rows={3} /></div>
-                <Button type="submit" disabled={submitting} className="w-full bg-gold text-primary hover:bg-gold/90">
+                <div><Label htmlFor="clinic_name">Nome da clínica (opcional)</Label><Input id="clinic_name" name="clinic_name" placeholder="Ex: Clínica Bem Estar" /></div>
+                <div>
+                  <Label htmlFor="logo">Logo da clínica (opcional)</Label>
+                  <Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />
+                  <p className="text-[11px] text-muted-foreground mt-1">Você pode adicionar ou alterar depois em "Meu perfil".</p>
+                </div>
+                <div><Label htmlFor="reason">Motivo (opcional)</Label><Textarea id="reason" name="reason" rows={2} /></div>
+                <Button type="submit" disabled={submitting || uploadingLogo} className="w-full bg-gold text-primary hover:bg-gold/90">
                   {submitting ? "Enviando..." : "Solicitar acesso"}
                 </Button>
               </form>

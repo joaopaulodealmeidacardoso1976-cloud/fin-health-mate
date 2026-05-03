@@ -18,6 +18,7 @@ interface Doc { id: string; doc_type: string; title: string; content: string; is
 
 export const ClinicalDocuments = ({ recordId, patientId, patientName, category }: { recordId: string; patientId: string; patientName: string; category: ProfessionalCategory }) => {
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const meta = getCategory(category);
   const [list, setList] = useState<Doc[]>([]);
   const [open, setOpen] = useState(false);

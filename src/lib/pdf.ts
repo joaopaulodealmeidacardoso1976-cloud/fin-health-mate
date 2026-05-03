@@ -137,7 +137,7 @@ export interface NutritionPdfInput {
 export function generateNutritionPlanPdf(input: NutritionPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, input.title);
+  let y = header(doc, input.clinicName, input.title, input.clinicLogoDataUrl ?? null);
   y = patientBlock(doc, input.patientName, input.issuedAt, y);
   if (input.validUntil) { doc.text(`Válido até: ${new Date(input.validUntil).toLocaleDateString("pt-BR")}`, 15, y); y += 8; }
 
@@ -181,7 +181,7 @@ export interface ExercisePdfInput {
 export function generateExercisePlanPdf(input: ExercisePdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, input.title);
+  let y = header(doc, input.clinicName, input.title, input.clinicLogoDataUrl ?? null);
   y = patientBlock(doc, input.patientName, input.issuedAt, y);
   const meta: string[] = [];
   if (input.frequency) meta.push(`Frequência: ${input.frequency}`);
@@ -227,7 +227,7 @@ export interface ClinicalDocPdfInput {
 export function generateClinicalDocumentPdf(input: ClinicalDocPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, input.docType);
+  let y = header(doc, input.clinicName, input.docType, input.clinicLogoDataUrl ?? null);
   y = patientBlock(doc, input.patientName, input.issuedAt, y);
   doc.setFont("helvetica", "bold").setFontSize(13).text(input.title, pageW / 2, y, { align: "center" });
   y += 10;
@@ -257,7 +257,7 @@ export interface ExamRequestPdfInput {
 export function generateExamRequestPdf(input: ExamRequestPdfInput) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = header(doc, input.clinicName, "Solicitação de Exames");
+  let y = header(doc, input.clinicName, "Solicitação de Exames", input.clinicLogoDataUrl ?? null);
   doc.setFontSize(11);
   doc.text(`Paciente: ${input.patientName}`, 15, y); y += 6;
   if (input.patientAge != null) { doc.text(`Idade: ${input.patientAge} anos`, 15, y); y += 6; }

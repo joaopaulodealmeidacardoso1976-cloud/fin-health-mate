@@ -26,6 +26,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { profile } = useProfessional();
+  const { clinic } = useClinic();
   const location = useLocation();
   const nav = isAdmin
     ? [...baseNav, { to: "/admin/solicitacoes", label: "Solicitações", icon: ShieldCheck }]

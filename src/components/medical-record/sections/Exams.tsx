@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { searchExams } from "@/lib/exams";
 import { generateExamRequestPdf } from "@/lib/pdf";
 import { useProfessional } from "@/hooks/useProfessional";
+import { useClinic, loadImageAsDataUrl } from "@/hooks/useClinic";
 import { calculateAge } from "@/lib/age";
 
 interface ExamRequest {

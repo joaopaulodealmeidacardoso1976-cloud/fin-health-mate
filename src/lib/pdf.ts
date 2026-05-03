@@ -125,6 +125,7 @@ function patientBlock(doc: jsPDF, name: string, issuedAt: Date, fromY: number) {
 // ----- Plano alimentar -----
 export interface NutritionPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   title: string;
   meals: { name: string; time?: string; items?: string }[];
@@ -168,6 +169,7 @@ export function generateNutritionPlanPdf(input: NutritionPdfInput) {
 // ----- Plano de exercícios -----
 export interface ExercisePdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   title: string;
   exercises: { name: string; sets?: string; reps?: string; load?: string; rest?: string; notes?: string }[];
@@ -216,6 +218,7 @@ export function generateExercisePlanPdf(input: ExercisePdfInput) {
 // ----- Documento clínico genérico (atestados, relatórios) -----
 export interface ClinicalDocPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   title: string;
   docType: string;
@@ -245,6 +248,7 @@ export function generateClinicalDocumentPdf(input: ClinicalDocPdfInput) {
 // ----- Solicitação de exames -----
 export interface ExamRequestPdfInput {
   clinicName: string;
+  clinicLogoDataUrl?: string | null;
   patientName: string;
   patientCpf?: string | null;
   patientAge?: number | null;

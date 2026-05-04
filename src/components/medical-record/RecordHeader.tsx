@@ -27,18 +27,11 @@ export const RecordHeader = ({ patientName, birthDate, allergies, risk, nextAppo
             {age !== null ? `${age} anos` : "Idade não informada"}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {allergies?.trim() && (
-            <Badge variant="destructive" className="gap-1">
-              <AlertTriangle className="h-3 w-3" /> Alergias: {allergies.length > 40 ? allergies.slice(0, 40) + "..." : allergies}
-            </Badge>
-          )}
-          {risk === "high" && <Badge variant="destructive">Risco alto</Badge>}
-          {risk === "medium" && <Badge className="bg-yellow-500/20 text-yellow-700 hover:bg-yellow-500/30">Risco médio</Badge>}
-          {nextAppointment && (
-            <Badge variant="secondary">Próximo retorno: {new Date(nextAppointment).toLocaleDateString("pt-BR")}</Badge>
-          )}
-        </div>
+      </div>
+    </div>
+  );
+};
+
       </div>
     </div>
   );

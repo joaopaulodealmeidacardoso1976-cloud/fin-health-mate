@@ -45,6 +45,8 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "atestado", label: "Atestado médico" },
       { value: "relatorio", label: "Relatório médico" },
+      { value: "laudo", label: "Laudo médico" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
       { value: "encaminhamento", label: "Encaminhamento" },
     ],
   },
@@ -54,6 +56,9 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "atestado", label: "Atestado odontológico" },
       { value: "relatorio", label: "Relatório clínico" },
+      { value: "laudo", label: "Laudo odontológico" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
+      { value: "encaminhamento", label: "Encaminhamento" },
     ],
   },
   psychology: {
@@ -62,7 +67,9 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "atestado_psi", label: "Atestado psicológico" },
       { value: "relatorio_psi", label: "Relatório psicológico" },
+      { value: "laudo_psi", label: "Laudo psicológico" },
       { value: "declaracao", label: "Declaração de comparecimento" },
+      { value: "encaminhamento", label: "Encaminhamento" },
     ],
   },
   nutrition: {
@@ -71,6 +78,8 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "plano_alimentar", label: "Plano alimentar (resumo)" },
       { value: "atestado_nutri", label: "Atestado nutricional" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
+      { value: "encaminhamento", label: "Encaminhamento" },
     ],
   },
   physiotherapy: {
@@ -79,6 +88,9 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "atestado_fisio", label: "Atestado fisioterápico" },
       { value: "plano_fisio", label: "Plano de tratamento fisioterápico" },
+      { value: "laudo_fisio", label: "Laudo fisioterápico" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
+      { value: "encaminhamento", label: "Encaminhamento" },
     ],
   },
   speech_therapy: {
@@ -87,6 +99,9 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "atestado_fono", label: "Atestado fonoaudiológico" },
       { value: "plano_fono", label: "Plano fonoaudiológico" },
+      { value: "laudo_fono", label: "Laudo fonoaudiológico" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
+      { value: "encaminhamento", label: "Encaminhamento" },
     ],
   },
   nursing: {
@@ -94,6 +109,7 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     sections: [...COMMON_START, "exam", "diagnosis", "plan", "treatment", "exams", "documents", ...COMMON_END],
     documentTypes: [
       { value: "relatorio_enf", label: "Relatório de enfermagem" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
     ],
   },
   occupational_therapy: {
@@ -102,6 +118,9 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "atestado_to", label: "Atestado terapêutico ocupacional" },
       { value: "plano_to", label: "Plano de intervenção ocupacional" },
+      { value: "laudo_to", label: "Laudo terapêutico ocupacional" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
+      { value: "encaminhamento", label: "Encaminhamento" },
     ],
   },
   physical_education: {
@@ -110,6 +129,7 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     documentTypes: [
       { value: "plano_treino", label: "Plano de treino" },
       { value: "avaliacao_fisica", label: "Avaliação física" },
+      { value: "declaracao", label: "Declaração de comparecimento" },
     ],
   },
 };

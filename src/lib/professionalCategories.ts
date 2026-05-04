@@ -51,7 +51,7 @@ export const CATEGORIES: Record<ProfessionalCategory, CategoryMeta> = {
     ],
   },
   dental: {
-    id: "dental", label: "Odontólogo", council: "CRO",
+    id: "dental", label: "C. Dentista", council: "CRO",
     sections: [...COMMON_START, "exam", "diagnosis", "plan", "treatment", "exams", "prescriptions", "documents", ...COMMON_END],
     documentTypes: [
       { value: "atestado", label: "Atestado odontológico" },

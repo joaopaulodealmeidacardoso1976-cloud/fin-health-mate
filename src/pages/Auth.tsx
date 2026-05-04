@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Stethoscope } from "lucide-react";
+import authBg from "@/assets/auth-bg.png";
 
 const signinSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
@@ -100,8 +101,12 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-elegant flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-elegant border-border/60">
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative bg-cover bg-center"
+      style={{ backgroundImage: `url(${authBg})` }}
+    >
+      <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" aria-hidden />
+      <Card className="relative w-full max-w-md shadow-elegant border-border/60 bg-card/85 backdrop-blur-md">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto h-14 w-14 rounded-full bg-gold-soft flex items-center justify-center">
             <Stethoscope className="h-7 w-7 text-gold-deep" />

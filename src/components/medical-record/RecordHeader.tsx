@@ -24,7 +24,7 @@ export const RecordHeader = ({ patientName, birthDate, allergies, risk, nextAppo
         <div className="flex-1 min-w-0">
           <h2 className="font-display text-2xl truncate">{patientName}</h2>
           <p className="text-sm text-muted-foreground">
-            {age !== null ? `${age} anos` : "Idade não informada"} • {recordType === "dental" ? "Odontológico" : "Médico"}
+            {age !== null ? `${age} anos` : "Idade não informada"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

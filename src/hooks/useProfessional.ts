@@ -16,24 +16,30 @@ export const useProfessional = () => {
   const [profile, setProfile] = useState<ProfessionalProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const load = async () => {
     if (!user) { setProfile(null); setLoading(false); return; }
-    (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, professional_category, professional_registry, professional_uf")
-        .eq("id", user.id)
-        .maybeSingle();
-      const cat = (data?.professional_category as ProfessionalCategory) || "medical";
-      setProfile({
-        category: cat,
-        registry: data?.professional_registry ?? null,
-        uf: data?.professional_uf ?? null,
-        fullName: data?.full_name ?? null,
-        meta: getCategory(cat),
-      });
-      setLoading(false);
-    })();
+    const { data } = await supabase
+      .from("profiles")
+      .select("full_name, professional_category, professional_registry, professional_uf")
+      .eq("id", user.id)
+      .maybeSingle();
+    const cat = (data?.professional_category as ProfessionalCategory) || "medical";
+    setProfile({
+      category: cat,
+      registry: data?.professional_registry ?? null,
+      uf: data?.professional_uf ?? null,
+      fullName: data?.full_name ?? null,
+      meta: getCategory(cat),
+    });
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, [user]);
+
+  useEffect(() => {
+    const h = () => load();
+    window.addEventListener("profile:updated", h);
+    return () => window.removeEventListener("profile:updated", h);
   }, [user]);
 
   return { profile, loading };

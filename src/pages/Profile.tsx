@@ -70,6 +70,7 @@ const Profile = () => {
     } as any).eq("id", user.id);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
+    window.dispatchEvent(new Event("profile:updated"));
     toast.success("Perfil atualizado");
   };
 

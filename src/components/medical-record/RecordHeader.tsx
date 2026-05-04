@@ -31,8 +31,3 @@ export const RecordHeader = ({ patientName, birthDate, allergies, risk, nextAppo
     </div>
   );
 };
-
-      </div>
-    </div>
-  );
-};

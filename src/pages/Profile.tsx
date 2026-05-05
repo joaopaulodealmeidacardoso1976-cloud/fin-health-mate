@@ -5,17 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORY_OPTIONS, getCategory, ProfessionalCategory } from "@/lib/professionalCategories";
 import { toast } from "sonner";
-import { UserCog, Upload, Image as ImageIcon } from "lucide-react";
+import { Upload, Image as ImageIcon } from "lucide-react";
 
 const Profile = () => {
   const { user } = useAuth();
-  const [fullName, setFullName] = useState("");
-  const [category, setCategory] = useState<ProfessionalCategory>("medical");
-  const [registry, setRegistry] = useState("");
-  const [uf, setUf] = useState("");
   const [clinicName, setClinicName] = useState("");
   const [clinicLogoUrl, setClinicLogoUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -29,14 +23,10 @@ const Profile = () => {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, professional_category, professional_registry, professional_uf, clinic_name, clinic_logo_url")
+        .select("clinic_name, clinic_logo_url")
         .eq("id", user.id)
         .maybeSingle();
       if (data) {
-        setFullName(data.full_name ?? "");
-        setCategory(((data as any).professional_category as ProfessionalCategory) || "medical");
-        setRegistry((data as any).professional_registry ?? "");
-        setUf((data as any).professional_uf ?? "");
         setClinicName((data as any).clinic_name ?? "");
         setClinicLogoUrl((data as any).clinic_logo_url ?? null);
       }
@@ -61,10 +51,6 @@ const Profile = () => {
     if (!user) return;
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
-      full_name: fullName,
-      professional_category: category,
-      professional_registry: registry || null,
-      professional_uf: uf || null,
       clinic_name: clinicName || null,
       clinic_logo_url: clinicLogoUrl,
     } as any).eq("id", user.id);
@@ -75,8 +61,6 @@ const Profile = () => {
   };
 
   if (loading) return <div className="text-muted-foreground">Carregando...</div>;
-
-  const meta = getCategory(category);
 
   return (
     <div className="max-w-2xl mx-auto w-full space-y-4">

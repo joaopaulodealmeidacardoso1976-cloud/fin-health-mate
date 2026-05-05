@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
-  PieChart, Pie, Cell, Legend, BarChart, Bar,
+  PieChart, Pie, Cell, Legend, BarChart, Bar, Treemap,
 } from "recharts";
 import { startOfWeek, startOfMonth, startOfYear, format, eachDayOfInterval, eachMonthOfInterval, endOfMonth, endOfYear, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";

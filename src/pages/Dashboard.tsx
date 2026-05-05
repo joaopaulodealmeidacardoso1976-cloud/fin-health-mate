@@ -34,7 +34,7 @@ const Dashboard = () => {
 
       const [{ data: pays }, { data: exps }, { data: appts }, { count: patientsCount }] = await Promise.all([
         supabase.from("payments").select("amount, method, paid_at").gte("paid_at", start.toISOString()).lte("paid_at", end.toISOString()),
-        supabase.from("expenses").select("amount, spent_at").gte("spent_at", start.toISOString()).lte("spent_at", end.toISOString()),
+        supabase.from("expenses").select("amount, spent_at, category").gte("spent_at", start.toISOString()).lte("spent_at", end.toISOString()),
         supabase.from("appointments").select("status, scheduled_at").gte("scheduled_at", start.toISOString()).lte("scheduled_at", end.toISOString()),
         supabase.from("patients").select("id", { count: "exact", head: true }),
       ]);

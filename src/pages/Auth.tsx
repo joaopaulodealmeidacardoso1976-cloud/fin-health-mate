@@ -36,6 +36,7 @@ const Auth = () => {
   const [submitting, setSubmitting] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [reqCategory, setReqCategory] = useState<ProfessionalCategory>("medical");
 
   useEffect(() => {
     document.title = "Entrar | Clínica";

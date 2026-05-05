@@ -151,6 +151,25 @@ const Auth = () => {
                 <div><Label htmlFor="password_r">Senha desejada</Label><Input id="password_r" name="password" type="password" required minLength={6} /></div>
                 <div><Label htmlFor="clinic_name">Nome da clínica (opcional)</Label><Input id="clinic_name" name="clinic_name" placeholder="Ex: Clínica Bem Estar" /></div>
                 <div>
+                  <Label>Categoria profissional</Label>
+                  <Select value={reqCategory} onValueChange={(v) => setReqCategory(v as ProfessionalCategory)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CATEGORY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <Label htmlFor="professional_registry">{getCategory(reqCategory).council} (nº do conselho)</Label>
+                    <Input id="professional_registry" name="professional_registry" required placeholder="Ex: 123456" />
+                  </div>
+                  <div>
+                    <Label htmlFor="professional_uf">UF</Label>
+                    <Input id="professional_uf" name="professional_uf" required maxLength={2} placeholder="SP" />
+                  </div>
+                </div>
+                <div>
                   <Label htmlFor="logo">Logo da clínica (opcional)</Label>
                   <Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />
                   <p className="text-[11px] text-muted-foreground mt-1">Você pode adicionar ou alterar depois em "Meu perfil".</p>

@@ -225,9 +225,8 @@ const TreemapCell = (props: any) => {
     </g>
   );
 };
-    </div>
-  );
-};
+
+
 
 const KpiCard = ({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent?: "gold" | "success" | "destructive" }) => (
   <Card className="shadow-soft">

@@ -71,6 +71,9 @@ const Auth = () => {
       password: fd.get("password"),
       reason: fd.get("reason") || undefined,
       clinic_name: fd.get("clinic_name") || undefined,
+      professional_category: reqCategory,
+      professional_registry: fd.get("professional_registry"),
+      professional_uf: (fd.get("professional_uf") as string)?.toUpperCase(),
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     setSubmitting(true);
@@ -93,6 +96,9 @@ const Auth = () => {
         reason: parsed.data.reason ?? null,
         clinic_name: parsed.data.clinic_name ?? null,
         clinic_logo_url: logoUrl,
+        professional_category: parsed.data.professional_category,
+        professional_registry: parsed.data.professional_registry,
+        professional_uf: parsed.data.professional_uf,
       } as any);
       if (error) throw error;
       toast.success("Solicitação enviada! Aguarde a autorização do administrador.");

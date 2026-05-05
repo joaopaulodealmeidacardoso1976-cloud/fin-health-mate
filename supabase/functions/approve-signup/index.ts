@@ -153,12 +153,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Apply clinic identity from the request to the user's profile
-    if (reqRow.clinic_name || reqRow.clinic_logo_url) {
-      await admin.from("profiles").update({
-        clinic_name: reqRow.clinic_name ?? null,
-        clinic_logo_url: reqRow.clinic_logo_url ?? null,
-      }).eq("id", approvedUser.id);
+    // Apply clinic identity and professional info from the request to the user's profile
+    const profileUpdate: Record<string, any> = {};
+    if (reqRow.clinic_name) profileUpdate.clinic_name = reqRow.clinic_name;
+    if (reqRow.clinic_logo_url) profileUpdate.clinic_logo_url = reqRow.clinic_logo_url;
+    if (reqRow.professional_category) profileUpdate.professional_category = reqRow.professional_category;
+    if (reqRow.professional_registry) profileUpdate.professional_registry = reqRow.professional_registry;
+    if (reqRow.professional_uf) profileUpdate.professional_uf = reqRow.professional_uf;
+    if (Object.keys(profileUpdate).length > 0) {
+      await admin.from("profiles").update(profileUpdate).eq("id", approvedUser.id);
     }
 
     await admin.from("signup_requests").update({

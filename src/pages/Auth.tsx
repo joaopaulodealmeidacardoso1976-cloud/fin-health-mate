@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Stethoscope } from "lucide-react";
 import authBg from "@/assets/auth-bg.png";
+import { CATEGORY_OPTIONS, getCategory, ProfessionalCategory } from "@/lib/professionalCategories";
 
 const signinSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
@@ -24,6 +26,9 @@ const requestSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
   reason: z.string().trim().max(500).optional(),
   clinic_name: z.string().trim().max(120).optional(),
+  professional_category: z.string().trim().min(1, "Selecione a categoria profissional"),
+  professional_registry: z.string().trim().min(1, "Informe o número do conselho").max(40),
+  professional_uf: z.string().trim().length(2, "UF deve ter 2 letras"),
 });
 
 const Auth = () => {
@@ -32,6 +37,7 @@ const Auth = () => {
   const [submitting, setSubmitting] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [reqCategory, setReqCategory] = useState<ProfessionalCategory>("medical");
 
   useEffect(() => {
     document.title = "Entrar | Clínica";
@@ -66,6 +72,9 @@ const Auth = () => {
       password: fd.get("password"),
       reason: fd.get("reason") || undefined,
       clinic_name: fd.get("clinic_name") || undefined,
+      professional_category: reqCategory,
+      professional_registry: fd.get("professional_registry"),
+      professional_uf: (fd.get("professional_uf") as string)?.toUpperCase(),
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     setSubmitting(true);
@@ -88,6 +97,9 @@ const Auth = () => {
         reason: parsed.data.reason ?? null,
         clinic_name: parsed.data.clinic_name ?? null,
         clinic_logo_url: logoUrl,
+        professional_category: parsed.data.professional_category,
+        professional_registry: parsed.data.professional_registry,
+        professional_uf: parsed.data.professional_uf,
       } as any);
       if (error) throw error;
       toast.success("Solicitação enviada! Aguarde a autorização do administrador.");
@@ -138,6 +150,25 @@ const Auth = () => {
                 <div><Label htmlFor="email_r">E-mail</Label><Input id="email_r" name="email" type="email" required /></div>
                 <div><Label htmlFor="password_r">Senha desejada</Label><Input id="password_r" name="password" type="password" required minLength={6} /></div>
                 <div><Label htmlFor="clinic_name">Nome da clínica (opcional)</Label><Input id="clinic_name" name="clinic_name" placeholder="Ex: Clínica Bem Estar" /></div>
+                <div>
+                  <Label>Categoria profissional</Label>
+                  <Select value={reqCategory} onValueChange={(v) => setReqCategory(v as ProfessionalCategory)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CATEGORY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <Label htmlFor="professional_registry">{getCategory(reqCategory).council} (nº do conselho)</Label>
+                    <Input id="professional_registry" name="professional_registry" required placeholder="Ex: 123456" />
+                  </div>
+                  <div>
+                    <Label htmlFor="professional_uf">UF</Label>
+                    <Input id="professional_uf" name="professional_uf" required maxLength={2} placeholder="SP" />
+                  </div>
+                </div>
                 <div>
                   <Label htmlFor="logo">Logo da clínica (opcional)</Label>
                   <Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)} />

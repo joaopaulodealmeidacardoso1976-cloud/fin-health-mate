@@ -904,6 +904,9 @@ export type Database = {
           full_name: string
           id: string
           password_hash: string
+          professional_category: string | null
+          professional_registry: string | null
+          professional_uf: string | null
           reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -917,6 +920,9 @@ export type Database = {
           full_name: string
           id?: string
           password_hash: string
+          professional_category?: string | null
+          professional_registry?: string | null
+          professional_uf?: string | null
           reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -930,6 +936,9 @@ export type Database = {
           full_name?: string
           id?: string
           password_hash?: string
+          professional_category?: string | null
+          professional_registry?: string | null
+          professional_uf?: string | null
           reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null

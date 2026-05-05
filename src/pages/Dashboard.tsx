@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
-  PieChart, Pie, Cell, Legend, BarChart, Bar,
+  PieChart, Pie, Cell, Legend, BarChart, Bar, Treemap,
 } from "recharts";
 import { startOfWeek, startOfMonth, startOfYear, format, eachDayOfInterval, eachMonthOfInterval, endOfMonth, endOfYear, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [series, setSeries] = useState<{ label: string; receita: number; despesa: number }[]>([]);
   const [attendanceSeries, setAttendanceSeries] = useState<{ label: string; atendidos: number; faltosos: number }[]>([]);
   const [methodData, setMethodData] = useState<{ name: string; value: number }[]>([]);
+  const [expensesTreemap, setExpensesTreemap] = useState<{ name: string; size: number }[]>([]);
 
   useEffect(() => {
     document.title = "Visão geral | Painel Clínico";
@@ -33,7 +34,7 @@ const Dashboard = () => {
 
       const [{ data: pays }, { data: exps }, { data: appts }, { count: patientsCount }] = await Promise.all([
         supabase.from("payments").select("amount, method, paid_at").gte("paid_at", start.toISOString()).lte("paid_at", end.toISOString()),
-        supabase.from("expenses").select("amount, spent_at").gte("spent_at", start.toISOString()).lte("spent_at", end.toISOString()),
+        supabase.from("expenses").select("amount, spent_at, category").gte("spent_at", start.toISOString()).lte("spent_at", end.toISOString()),
         supabase.from("appointments").select("status, scheduled_at").gte("scheduled_at", start.toISOString()).lte("scheduled_at", end.toISOString()),
         supabase.from("patients").select("id", { count: "exact", head: true }),
       ]);
@@ -72,6 +73,12 @@ const Dashboard = () => {
       const methodTotals: Record<string, number> = {};
       (pays ?? []).forEach((p: any) => { methodTotals[p.method] = (methodTotals[p.method] ?? 0) + Number(p.amount); });
       setMethodData(Object.entries(methodTotals).map(([k, v]) => ({ name: methodLabels[k] ?? k, value: v })));
+
+      // Expenses treemap by category
+      const catLabels: Record<string, string> = { materials: "Materiais", cleaning: "Limpeza", salaries: "Salários", rent: "Aluguel", utilities: "Utilidades", other: "Outros" };
+      const catTotals: Record<string, number> = {};
+      (exps ?? []).forEach((e: any) => { catTotals[e.category] = (catTotals[e.category] ?? 0) + Number(e.amount); });
+      setExpensesTreemap(Object.entries(catTotals).map(([k, v]) => ({ name: catLabels[k] ?? k, size: v })));
     })();
   }, [range]);
 
@@ -153,28 +160,73 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <Card className="shadow-soft flex flex-col min-h-0 flex-1">
-        <CardHeader className="py-3">
-          <CardTitle className="font-display text-base">Atendidos vs. Faltosos</CardTitle>
-          <CardDescription className="text-xs">Comparativo de comparecimento no período</CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1 min-h-0 pb-3">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={attendanceSeries}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 88%)" />
-              <XAxis dataKey="label" stroke="hsl(220, 9%, 46%)" fontSize={12} />
-              <YAxis stroke="hsl(220, 9%, 46%)" fontSize={12} allowDecimals={false} />
-              <Tooltip contentStyle={{ background: "hsl(0,0%,100%)", border: "1px solid hsl(40,15%,88%)", borderRadius: 8 }} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="atendidos" name="Atendidos" fill="hsl(38, 45%, 58%)" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="faltosos" name="Faltosos" fill="hsl(220, 13%, 35%)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <div className="grid gap-3 lg:grid-cols-2 flex-1 min-h-0">
+        <Card className="shadow-soft flex flex-col min-h-0">
+          <CardHeader className="py-3">
+            <CardTitle className="font-display text-base">Atendidos vs. Faltosos</CardTitle>
+            <CardDescription className="text-xs">Comparativo de comparecimento no período</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 min-h-0 pb-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={attendanceSeries}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 88%)" />
+                <XAxis dataKey="label" stroke="hsl(220, 9%, 46%)" fontSize={12} />
+                <YAxis stroke="hsl(220, 9%, 46%)" fontSize={12} allowDecimals={false} />
+                <Tooltip contentStyle={{ background: "hsl(0,0%,100%)", border: "1px solid hsl(40,15%,88%)", borderRadius: 8 }} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <Bar dataKey="atendidos" name="Atendidos" fill="hsl(38, 45%, 58%)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="faltosos" name="Faltosos" fill="hsl(220, 13%, 35%)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-soft flex flex-col min-h-0">
+          <CardHeader className="py-3">
+            <CardTitle className="font-display text-base">Despesas por categoria</CardTitle>
+            <CardDescription className="text-xs">Distribuição proporcional no período</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 min-h-0 pb-3">
+            {expensesTreemap.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center pt-16">Sem despesas no período</p>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <Treemap
+                  data={expensesTreemap}
+                  dataKey="size"
+                  nameKey="name"
+                  stroke="hsl(0,0%,100%)"
+                  content={<TreemapCell />}
+                >
+                  <Tooltip formatter={(v: any) => fmt(Number(v))} />
+                </Treemap>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
+
+const treemapColors = ["hsl(38, 45%, 58%)", "hsl(36, 40%, 45%)", "hsl(40, 50%, 70%)", "hsl(220, 13%, 35%)", "hsl(40, 30%, 50%)", "hsl(36, 25%, 60%)"];
+const TreemapCell = (props: any) => {
+  const { x, y, width, height, index, name, size } = props;
+  const fill = treemapColors[index % treemapColors.length];
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} fill={fill} stroke="hsl(0,0%,100%)" />
+      {width > 70 && height > 30 && (
+        <>
+          <text x={x + 8} y={y + 18} fill="hsl(0,0%,100%)" fontSize={12} fontWeight={600}>{name}</text>
+          <text x={x + 8} y={y + 34} fill="hsl(0,0%,100%)" fontSize={11} opacity={0.9}>{fmt(Number(size))}</text>
+        </>
+      )}
+    </g>
+  );
+};
+
+
 
 const KpiCard = ({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent?: "gold" | "success" | "destructive" }) => (
   <Card className="shadow-soft">

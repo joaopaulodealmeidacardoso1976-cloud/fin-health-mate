@@ -89,6 +89,9 @@ const Profile = () => {
               )}
             </div>
           </div>
+          <div className="flex justify-end pt-2">
+            <Button onClick={save} disabled={saving} className="bg-gold text-primary hover:bg-gold/90">Salvar</Button>
+          </div>
         </CardContent>
       </Card>
 

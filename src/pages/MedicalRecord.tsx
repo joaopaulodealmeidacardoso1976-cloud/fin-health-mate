@@ -70,7 +70,7 @@ const MedicalRecord = () => {
 
   // Categoria efetiva: do profissional logado (admin pode usar a do prontuário se quiser).
   const category = profile.category;
-  const isDental = category === "dental" || record.record_type === "dental";
+  const isDental = category === "dental";
 
   // Se a seção ativa não é visível para a categoria, voltar para identificação.
   if (!isSectionVisible(category, active)) {

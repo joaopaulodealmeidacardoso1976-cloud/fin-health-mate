@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export type ToothStatus = "healthy" | "caries" | "restored" | "missing" | "treatment";
+export type ToothStatus = "healthy" | "caries" | "restored" | "missing" | "treatment" | "implant";
 
 const STATUS_COLORS: Record<ToothStatus, string> = {
   healthy: "hsl(var(--card))",
   caries: "hsl(0 84% 60%)",
   restored: "hsl(217 91% 60%)",
-  missing: "hsl(var(--muted))",
+  missing: "hsl(0 0% 0%)",
   treatment: "hsl(45 93% 58%)",
+  implant: "hsl(142 71% 45%)",
 };
 
 const STATUS_LABELS: Record<ToothStatus, string> = {
-  healthy: "Hígido", caries: "Cárie", restored: "Restaurado", missing: "Ausente", treatment: "Em tratamento",
+  healthy: "Hígido", caries: "Cárie", restored: "Restaurado", missing: "Ausente", treatment: "Em tratamento", implant: "Implante",
 };
 
 const UPPER = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];

@@ -160,25 +160,71 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <Card className="shadow-soft flex flex-col min-h-0 flex-1">
-        <CardHeader className="py-3">
-          <CardTitle className="font-display text-base">Atendidos vs. Faltosos</CardTitle>
-          <CardDescription className="text-xs">Comparativo de comparecimento no período</CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1 min-h-0 pb-3">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={attendanceSeries}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 88%)" />
-              <XAxis dataKey="label" stroke="hsl(220, 9%, 46%)" fontSize={12} />
-              <YAxis stroke="hsl(220, 9%, 46%)" fontSize={12} allowDecimals={false} />
-              <Tooltip contentStyle={{ background: "hsl(0,0%,100%)", border: "1px solid hsl(40,15%,88%)", borderRadius: 8 }} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="atendidos" name="Atendidos" fill="hsl(38, 45%, 58%)" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="faltosos" name="Faltosos" fill="hsl(220, 13%, 35%)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <div className="grid gap-3 lg:grid-cols-2 flex-1 min-h-0">
+        <Card className="shadow-soft flex flex-col min-h-0">
+          <CardHeader className="py-3">
+            <CardTitle className="font-display text-base">Atendidos vs. Faltosos</CardTitle>
+            <CardDescription className="text-xs">Comparativo de comparecimento no período</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 min-h-0 pb-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={attendanceSeries}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 88%)" />
+                <XAxis dataKey="label" stroke="hsl(220, 9%, 46%)" fontSize={12} />
+                <YAxis stroke="hsl(220, 9%, 46%)" fontSize={12} allowDecimals={false} />
+                <Tooltip contentStyle={{ background: "hsl(0,0%,100%)", border: "1px solid hsl(40,15%,88%)", borderRadius: 8 }} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <Bar dataKey="atendidos" name="Atendidos" fill="hsl(38, 45%, 58%)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="faltosos" name="Faltosos" fill="hsl(220, 13%, 35%)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-soft flex flex-col min-h-0">
+          <CardHeader className="py-3">
+            <CardTitle className="font-display text-base">Despesas por categoria</CardTitle>
+            <CardDescription className="text-xs">Distribuição proporcional no período</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 min-h-0 pb-3">
+            {expensesTreemap.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center pt-16">Sem despesas no período</p>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <Treemap
+                  data={expensesTreemap}
+                  dataKey="size"
+                  nameKey="name"
+                  stroke="hsl(0,0%,100%)"
+                  content={<TreemapCell />}
+                >
+                  <Tooltip formatter={(v: any) => fmt(Number(v))} />
+                </Treemap>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+const treemapColors = ["hsl(38, 45%, 58%)", "hsl(36, 40%, 45%)", "hsl(40, 50%, 70%)", "hsl(220, 13%, 35%)", "hsl(40, 30%, 50%)", "hsl(36, 25%, 60%)"];
+const TreemapCell = (props: any) => {
+  const { x, y, width, height, index, name, size } = props;
+  const fill = treemapColors[index % treemapColors.length];
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} fill={fill} stroke="hsl(0,0%,100%)" />
+      {width > 70 && height > 30 && (
+        <>
+          <text x={x + 8} y={y + 18} fill="hsl(0,0%,100%)" fontSize={12} fontWeight={600}>{name}</text>
+          <text x={x + 8} y={y + 34} fill="hsl(0,0%,100%)" fontSize={11} opacity={0.9}>{fmt(Number(size))}</text>
+        </>
+      )}
+    </g>
+  );
+};
     </div>
   );
 };

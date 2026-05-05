@@ -108,40 +108,6 @@ const Profile = () => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2"><UserCog className="h-5 w-5" />Meu Perfil Profissional</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label>Nome completo</Label>
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
-          </div>
-          <div>
-            <Label>Categoria profissional</Label>
-            <Select value={category} onValueChange={(v) => setCategory(v as ProfessionalCategory)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {CATEGORY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground mt-1">O prontuário e os documentos serão adaptados para esta categoria.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="md:col-span-2">
-              <Label>{meta.council} (número do conselho)</Label>
-              <Input value={registry} onChange={(e) => setRegistry(e.target.value)} placeholder="Ex: 123456" />
-            </div>
-            <div>
-              <Label>UF</Label>
-              <Input value={uf} onChange={(e) => setUf(e.target.value.toUpperCase())} maxLength={2} placeholder="SP" />
-            </div>
-          </div>
-          <div className="flex justify-end pt-2">
-            <Button onClick={save} disabled={saving} className="bg-gold text-primary hover:bg-gold/90">Salvar</Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

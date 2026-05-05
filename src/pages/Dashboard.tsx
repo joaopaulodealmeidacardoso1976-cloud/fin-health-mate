@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [series, setSeries] = useState<{ label: string; receita: number; despesa: number }[]>([]);
   const [attendanceSeries, setAttendanceSeries] = useState<{ label: string; atendidos: number; faltosos: number }[]>([]);
   const [methodData, setMethodData] = useState<{ name: string; value: number }[]>([]);
+  const [expensesTreemap, setExpensesTreemap] = useState<{ name: string; size: number }[]>([]);
 
   useEffect(() => {
     document.title = "Visão geral | Painel Clínico";

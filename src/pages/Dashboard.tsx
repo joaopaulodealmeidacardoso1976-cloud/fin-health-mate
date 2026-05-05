@@ -73,6 +73,12 @@ const Dashboard = () => {
       const methodTotals: Record<string, number> = {};
       (pays ?? []).forEach((p: any) => { methodTotals[p.method] = (methodTotals[p.method] ?? 0) + Number(p.amount); });
       setMethodData(Object.entries(methodTotals).map(([k, v]) => ({ name: methodLabels[k] ?? k, value: v })));
+
+      // Expenses treemap by category
+      const catLabels: Record<string, string> = { materials: "Materiais", cleaning: "Limpeza", salaries: "Salários", rent: "Aluguel", utilities: "Utilidades", other: "Outros" };
+      const catTotals: Record<string, number> = {};
+      (exps ?? []).forEach((e: any) => { catTotals[e.category] = (catTotals[e.category] ?? 0) + Number(e.amount); });
+      setExpensesTreemap(Object.entries(catTotals).map(([k, v]) => ({ name: catLabels[k] ?? k, size: v })));
     })();
   }, [range]);
 

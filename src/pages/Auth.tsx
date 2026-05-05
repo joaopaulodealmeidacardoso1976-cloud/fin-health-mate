@@ -25,6 +25,9 @@ const requestSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
   reason: z.string().trim().max(500).optional(),
   clinic_name: z.string().trim().max(120).optional(),
+  professional_category: z.string().trim().min(1, "Selecione a categoria profissional"),
+  professional_registry: z.string().trim().min(1, "Informe o número do conselho").max(40),
+  professional_uf: z.string().trim().length(2, "UF deve ter 2 letras"),
 });
 
 const Auth = () => {

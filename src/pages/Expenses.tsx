@@ -117,16 +117,25 @@ const Expenses = () => {
                 </Select>
               </div>
               <div><Label>Observações</Label><Textarea name="notes" rows={2} /></div>
-              <div>
-                <Label>Nota fiscal (opcional)</Label>
-                <Input
+              <div className="flex flex-col items-center gap-2 pt-2">
+                <Label className="font-display text-base">Inserir Nota Fiscal</Label>
+                <input
+                  id="invoice-file"
                   type="file"
                   accept="application/pdf,image/png,image/jpeg,image/webp"
+                  className="hidden"
                   onChange={(e) => setInvoiceFile(e.target.files?.[0] ?? null)}
                 />
-                <p className="text-xs text-muted-foreground mt-1">PDF ou imagem, até 10MB.</p>
+                <label
+                  htmlFor="invoice-file"
+                  className="h-16 w-16 rounded-full bg-gold-soft text-gold-deep flex items-center justify-center cursor-pointer hover:bg-gold-soft/80 transition-colors border border-gold-deep/20"
+                  title="Selecionar nota fiscal"
+                >
+                  <Receipt className="h-7 w-7" />
+                </label>
+                <p className="text-xs text-muted-foreground">PDF ou imagem, até 10MB.</p>
                 {invoiceFile && (
-                  <p className="text-xs mt-1 flex items-center gap-1 text-muted-foreground">
+                  <p className="text-xs flex items-center gap-1 text-muted-foreground">
                     <Paperclip className="h-3 w-3" />{invoiceFile.name}
                   </p>
                 )}

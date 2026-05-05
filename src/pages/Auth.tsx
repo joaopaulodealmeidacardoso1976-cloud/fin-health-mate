@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Stethoscope } from "lucide-react";
 import authBg from "@/assets/auth-bg.png";
+import { CATEGORY_OPTIONS, getCategory, ProfessionalCategory } from "@/lib/professionalCategories";
 
 const signinSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),

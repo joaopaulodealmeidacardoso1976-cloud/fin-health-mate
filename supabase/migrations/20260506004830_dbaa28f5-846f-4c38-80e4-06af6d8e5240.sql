@@ -1,1 +1,0 @@
-DROP POLICY IF EXISTS "user updates own profile" ON public.profiles;

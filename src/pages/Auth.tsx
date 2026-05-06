@@ -63,6 +63,25 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const emailInput = document.getElementById("email") as HTMLInputElement | null;
+    const email = emailInput?.value?.trim();
+    const parsed = z.string().email().safeParse(email);
+    if (!parsed.success) return toast.error("Informe seu e-mail no campo acima para recuperar a senha");
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Enviamos um link de recuperação para seu e-mail.");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao enviar e-mail de recuperação");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleRequest = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -136,6 +155,11 @@ const Auth = () => {
               <form onSubmit={handleSignin} className="space-y-4">
                 <div><Label htmlFor="email">E-mail</Label><Input id="email" name="email" type="email" required /></div>
                 <div><Label htmlFor="password">Senha</Label><Input id="password" name="password" type="password" required /></div>
+                <div className="text-right">
+                  <button type="button" onClick={handleForgotPassword} className="text-xs text-primary hover:underline">
+                    Esqueci minha senha
+                  </button>
+                </div>
                 <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                   {submitting ? "Entrando..." : "Entrar"}
                 </Button>

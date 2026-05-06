@@ -40,7 +40,7 @@ const Auth = () => {
   const [reqCategory, setReqCategory] = useState<ProfessionalCategory>("medical");
 
   useEffect(() => {
-    document.title = "Entrar | Clínica";
+    document.title = "Entrar | DADOSTOP CLINIC";
   }, []);
 
   if (loading) return null;
@@ -123,7 +123,7 @@ const Auth = () => {
           <div className="mx-auto h-14 w-14 rounded-full bg-gold-soft flex items-center justify-center">
             <Stethoscope className="h-7 w-7 text-gold-deep" />
           </div>
-          <CardTitle className="font-display text-3xl">Painel Clínico</CardTitle>
+          <CardTitle className="font-display text-3xl">DADOSTOP CLINIC</CardTitle>
           <CardDescription>Acesso restrito ao profissional</CardDescription>
         </CardHeader>
         <CardContent>

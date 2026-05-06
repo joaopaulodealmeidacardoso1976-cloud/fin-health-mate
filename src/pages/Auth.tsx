@@ -11,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Stethoscope } from "lucide-react";
 import authBg from "@/assets/auth-bg.png";
+import logoDadosTop from "@/assets/logo-dadostop.png";
 import { CATEGORY_OPTIONS, getCategory, ProfessionalCategory } from "@/lib/professionalCategories";
 
 const signinSchema = z.object({

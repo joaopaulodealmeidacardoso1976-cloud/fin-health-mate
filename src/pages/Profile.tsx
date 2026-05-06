@@ -5,8 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Upload, Image as ImageIcon } from "lucide-react";
+import { Upload, Image as ImageIcon, UserCog } from "lucide-react";
+import { CATEGORY_OPTIONS, ProfessionalCategory } from "@/lib/professionalCategories";
+
+const ADMIN_EMAIL = "joaopaulodealmeidacardoso1976@gmail.com";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -15,20 +19,29 @@ const Profile = () => {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [category, setCategory] = useState<ProfessionalCategory>("medical");
+  const [registry, setRegistry] = useState("");
+  const [uf, setUf] = useState("");
+  const [savingProf, setSavingProf] = useState(false);
 
-  useEffect(() => { document.title = "Meu Perfil | Painel Clínico"; }, []);
+  const isAdminUser = user?.email === ADMIN_EMAIL;
+
+  useEffect(() => { document.title = "Meu Perfil | DADOSTOP CLINIC"; }, []);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("clinic_name, clinic_logo_url")
+        .select("clinic_name, clinic_logo_url, professional_category, professional_registry, professional_uf")
         .eq("id", user.id)
         .maybeSingle();
       if (data) {
         setClinicName((data as any).clinic_name ?? "");
         setClinicLogoUrl((data as any).clinic_logo_url ?? null);
+        setCategory(((data as any).professional_category as ProfessionalCategory) ?? "medical");
+        setRegistry((data as any).professional_registry ?? "");
+        setUf((data as any).professional_uf ?? "");
       }
       setLoading(false);
     })();
@@ -58,6 +71,20 @@ const Profile = () => {
     if (error) { toast.error(error.message); return; }
     window.dispatchEvent(new Event("profile:updated"));
     toast.success("Perfil atualizado");
+  };
+
+  const saveProfessional = async () => {
+    if (!user) return;
+    setSavingProf(true);
+    const { error } = await supabase.from("profiles").update({
+      professional_category: category,
+      professional_registry: registry || null,
+      professional_uf: uf ? uf.toUpperCase() : null,
+    } as any).eq("id", user.id);
+    setSavingProf(false);
+    if (error) { toast.error(error.message); return; }
+    window.dispatchEvent(new Event("profile:updated"));
+    toast.success("Perfil profissional atualizado");
   };
 
   if (loading) return <div className="text-muted-foreground">Carregando...</div>;
@@ -95,6 +122,40 @@ const Profile = () => {
         </CardContent>
       </Card>
 
+      {isAdminUser && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><UserCog className="h-5 w-5" />Perfil profissional (admin)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-xs text-muted-foreground">Disponível apenas para o administrador. Permite trocar a categoria profissional do seu acesso.</p>
+            <div>
+              <Label>Categoria profissional</Label>
+              <Select value={category} onValueChange={(v) => setCategory(v as ProfessionalCategory)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CATEGORY_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Nº do conselho</Label>
+                <Input value={registry} onChange={(e) => setRegistry(e.target.value)} placeholder="Ex: 12345" />
+              </div>
+              <div>
+                <Label>UF</Label>
+                <Input value={uf} onChange={(e) => setUf(e.target.value.toUpperCase())} maxLength={2} placeholder="SP" />
+              </div>
+            </div>
+            <div className="flex justify-end pt-2">
+              <Button onClick={saveProfessional} disabled={savingProf} className="bg-gold text-primary hover:bg-gold/90">Salvar</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

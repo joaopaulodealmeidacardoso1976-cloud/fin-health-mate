@@ -11,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Stethoscope } from "lucide-react";
 import authBg from "@/assets/auth-bg.png";
+import logoDadosTop from "@/assets/logo-dadostop.png";
 import { CATEGORY_OPTIONS, getCategory, ProfessionalCategory } from "@/lib/professionalCategories";
 
 const signinSchema = z.object({
@@ -120,8 +120,8 @@ const Auth = () => {
       <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" aria-hidden />
       <Card className="relative w-full max-w-md shadow-elegant border-border/60 bg-card/85 backdrop-blur-md">
         <CardHeader className="text-center space-y-2">
-          <div className="mx-auto h-14 w-14 rounded-full bg-gold-soft flex items-center justify-center">
-            <Stethoscope className="h-7 w-7 text-gold-deep" />
+          <div className="mx-auto h-20 w-20 rounded-full overflow-hidden flex items-center justify-center">
+            <img src={logoDadosTop} alt="DADOSTOP CLINIC logo" className="h-full w-full object-contain" />
           </div>
           <CardTitle className="font-display text-3xl">DADOSTOP CLINIC</CardTitle>
           <CardDescription>Acesso restrito ao profissional</CardDescription>
